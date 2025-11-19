@@ -7,4 +7,10 @@
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Pages\Cuenta\" />
+    <Folder Include="Components\Pages\PreAviso\" />
+    <Folder Include="Components\Pages\Paquete\" />
+  </ItemGroup>
+
 </Project>
