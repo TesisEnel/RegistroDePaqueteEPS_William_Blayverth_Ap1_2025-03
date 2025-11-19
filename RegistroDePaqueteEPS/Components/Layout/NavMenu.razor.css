@@ -1,90 +1,73 @@
-/* Importar fuente Jaldi de Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Jaldi:wght@400;700&display=swap');
-
-.nav-container {
-    /* Dimensiones del diseño original */
+/* El contenedor translúcido redondeado */
+.nav-card {
+    background: rgba(255, 255, 255, 0.1); /* Figma: 10% opacidad */
+    border-radius: 30px; /* Figma: Radio de 30px */
     width: 174px;
-    /* Ajustamos la altura para que quepa en la pantalla sin salirse */
-    height: calc(100vh - 160px);
-    /* Estilo del rectángulo semitransparente (Rectangle 9) */
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
-    /* Flexbox para organizar los elementos verticalmente */
+    height: 100%; /* Llena el alto del sidebar-container */
+    min-height: 600px; /* Altura mínima para que se vea bien */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 40px;
-    padding-bottom: 20px;
-    margin: 20px; /* Un poco de separación del borde de la pantalla */
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+    backdrop-filter: blur(5px); /* Efecto moderno opcional */
 }
 
-.nav-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 50px; /* Espacio entre cada botón del menú */
-    width: 100%;
-    align-items: center;
-}
-
-/* Estilo de cada Item (NavLink) */
 .nav-item {
+    width: 100%;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Estilos del enlace (NavLink) */
+::deep .nav-link {
     display: flex;
     flex-direction: column; /* Icono arriba, texto abajo */
     align-items: center;
     justify-content: center;
-    text-decoration: none; /* Quitar subrayado */
     color: #FFFFFF;
-    transition: transform 0.2s;
+    text-decoration: none;
+    transition: all 0.3s;
+    background: transparent !important; /* Quitar fondo hover de bootstrap */
 }
-
-    .nav-item:hover {
-        transform: scale(1.1); /* Pequeño efecto zoom al pasar el mouse */
-        text-shadow: 0 0 10px rgba(255,255,255,0.5);
-    }
-
-    /* Estilo cuando el link está activo/seleccionado */
-    .nav-item.active {
-        font-weight: bold;
-        filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
-    }
 
 /* Iconos */
 .nav-icon {
-    font-size: 60px; /* Tamaño grande como en el diseño */
-    margin-bottom: 5px;
+    font-size: 3rem; /* Tamaño grande como en el diseño */
+    margin-bottom: 0.5rem;
+    color: white;
 }
 
-/* Texto (Tipografía Jaldi) */
+/* Texto (Jaldi) */
 .nav-text {
     font-family: 'Jaldi', sans-serif;
-    font-style: normal;
-    font-weight: 400;
     font-size: 24px;
-    line-height: 24px;
-    text-align: center;
+    font-weight: 400;
     text-transform: capitalize;
+    line-height: 1;
 }
 
-/* --- SECCIÓN DEL LOGO INFERIOR --- */
-
-.nav-footer-logo {
-    margin-top: auto; /* Esto empuja el logo hacia el final del contenedor */
-    margin-bottom: 20px;
+/* Efecto Hover (Opcional, para que se sienta interactivo) */
+::deep .nav-link:hover {
+    transform: scale(1.05);
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
 
-.logo-circle {
-    width: 100px;
-    height: 100px;
-    background: #FFFFFF;
-    border-radius: 50%; /* Hace que sea un círculo perfecto */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+/* Estado Activo */
+::deep .nav-link.active {
+    font-weight: 700;
+    opacity: 1;
 }
 
-    .logo-circle img {
-        width: 69px; /* Dimensiones de tu diseño */
-        height: auto;
-        object-fit: contain;
-    }
+/* Mantenemos el botón redondo blanco que ya teníamos */
+.menu-footer {
+    margin-top: auto;
+}
+
+/* Nueva clase para tu imagen */
+.toggle-logo {
+    width: 65px; /* Ajusta este tamaño para que el logo "E" se vea bien */
+    height: auto;
+    object-fit: contain;
+    transform: translateX(15px);
+}

@@ -1,33 +1,69 @@
-.contenedor-principal {
+.page {
+    position: relative;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    min-height: 100vh; /* Asegura que ocupe el 100% de la altura de la ventana */
-    background-color: #006089; /* Tu color azul de fondo */
-    position: relative;
+    min-height: 100vh;
+    background-color: #006089; /* Color de fondo azul del diseño */
+    font-family: 'Jaldi', sans-serif;
 }
 
-.encabezado {
+/* --- Header Blanco --- */
+.top-header {
     background-color: #FFFFFF;
-    height: 128px; /* Altura fija según tu diseño */
+    height: 128px; /* Altura exacta de Figma */
     width: 100%;
-    /* Flexbox para alinear el logo */
     display: flex;
-    align-items: center; /* Centra el logo verticalmente */
-    padding-left: 9px; /* Tu margen izquierdo original */
-    /* Opcional: Para que la barra se quede fija al hacer scroll, descomenta abajo: */
-    /* position: sticky; top: 0; z-index: 100; */
+    align-items: center;
+    padding-left: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 20;
 }
 
-.logo-imagen {
-    width: 313px;
-    height: 113px;
-    object-fit: contain; /* Evita que la imagen se estire o deforme */
-    display: block;
+.logo-img {
+    max-height: 80px; /* Ajusta según tu logo real */
+    width: auto;
 }
 
-.contenido {
-    flex: 1; /* Ocupa todo el espacio restante debajo del encabezado */
-    padding: 20px; /* Espacio interno para que el texto no toque los bordes */
-    color: white; /* Texto blanco para contrastar con el fondo azul */
+/* --- Layout del Cuerpo --- */
+.main-container {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    height: calc(100vh - 128px); /* Restamos la altura del header */
+    overflow: hidden;
+}
+
+/* --- Área de Contenido --- */
+.content {
+    flex: 1; /* Ocupa todo el espacio disponible */
+    padding: 2rem;
+    overflow-y: auto;
+    color: white; /* Texto blanco por defecto sobre fondo azul */
+}
+
+/* --- Contenedor del Sidebar (Derecha) --- */
+.sidebar-container {
+    width: 200px; /* Un poco más ancho que los 174px para margen */
+    display: flex;
+    justify-content: center;
+    padding-top: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Responsividad para móviles */
+@media (max-width: 800px) {
+    .main-container {
+        flex-direction: column-reverse; /* Menú abajo en móviles */
+    }
+
+    .sidebar-container {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+    }
+
+    .top-header {
+        height: 80px;
+    }
 }
