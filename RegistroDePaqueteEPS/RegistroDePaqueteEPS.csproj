@@ -11,6 +11,8 @@
     <Folder Include="Components\Pages\Cuenta\" />
     <Folder Include="Components\Pages\PreAviso\" />
     <Folder Include="Components\Pages\Paquete\" />
+    <Folder Include="Data\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <ItemGroup>
