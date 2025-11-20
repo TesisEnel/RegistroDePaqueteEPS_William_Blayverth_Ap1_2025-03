@@ -8,9 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Components\Pages\Cuenta\" />
-    <Folder Include="Components\Pages\PreAviso\" />
-    <Folder Include="Components\Pages\Paquete\" />
+    <Content Include="Components\Pages\Usuario\Paquete\Paquete.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Pages\Admin\" />
     <Folder Include="Data\" />
     <Folder Include="Data\" />
   </ItemGroup>

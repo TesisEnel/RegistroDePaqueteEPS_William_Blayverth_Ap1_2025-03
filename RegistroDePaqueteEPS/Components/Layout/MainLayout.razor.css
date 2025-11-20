@@ -1,16 +1,16 @@
+/* --- Mantenemos tus estilos base --- */
 .page {
     position: relative;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #006089; /* Color de fondo azul del diseño */
+    background-color: #006089;
     font-family: 'Jaldi', sans-serif;
 }
 
-/* --- Header Blanco --- */
 .top-header {
     background-color: #FFFFFF;
-    height: 128px; /* Altura exacta de Figma */
+    height: 128px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -20,30 +20,48 @@
 }
 
 .logo-img {
-    max-height: 80px; /* Ajusta según tu logo real */
+    max-height: 80px;
     width: auto;
 }
 
-/* --- Layout del Cuerpo --- */
 .main-container {
     display: flex;
     flex: 1;
     flex-direction: row;
-    height: calc(100vh - 128px); /* Restamos la altura del header */
+    height: calc(100vh - 128px);
     overflow: hidden;
 }
 
-/* --- Área de Contenido --- */
+/* --- MODIFICACIÓN AQUÍ: Agregamos display flex --- */
 .content {
-    flex: 1; /* Ocupa todo el espacio disponible */
-    padding: 2rem;
+    flex: 1;
+    padding: 0; /* <--- ESTO ES CLAVE: Quitamos el colchón general */
     overflow-y: auto;
-    color: white; /* Texto blanco por defecto sobre fondo azul */
+    color: white;
+    display: flex;
+    flex-direction: column;
 }
 
-/* --- Contenedor del Sidebar (Derecha) --- */
+/* Clase auxiliar para que @Body ocupe el espacio libre */
+.content-body {
+    flex: 1;
+    padding: 2rem; /* <--- El relleno ahora vive aquí */
+}
+
+/* 3. En .layout-footer: Ajustamos para que se pegue a los bordes pero respire un poco */
+.layout-footer {
+    margin-top: auto;
+    /* Padding: 10px arriba/abajo (poco), 2rem lados (para alinearse con el logo) */
+    padding: 10px 2rem;
+    align-items: center;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    background-color: transparent; /* Opcional */
+}
+
 .sidebar-container {
-    width: 200px; /* Un poco más ancho que los 174px para margen */
+    width: 200px;
     display: flex;
     justify-content: center;
     padding-top: 2rem;
@@ -51,10 +69,25 @@
     padding-bottom: 2rem;
 }
 
-/* Responsividad para móviles */
+.copyright-text {
+    color: #FFFFFF; /* Color Cyan de la imagen */
+    font-size: 20px;
+}
+
+.footer-link {
+    color: #FFFFFF; /* Color blanco */
+    text-decoration: none;
+    font-size: 20px;
+}
+
+    .footer-link:hover {
+        text-decoration: underline;
+    }
+
+/* Responsividad */
 @media (max-width: 800px) {
     .main-container {
-        flex-direction: column-reverse; /* Menú abajo en móviles */
+        flex-direction: column-reverse;
     }
 
     .sidebar-container {
