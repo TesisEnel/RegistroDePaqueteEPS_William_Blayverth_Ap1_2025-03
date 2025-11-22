@@ -1,10 +1,11 @@
-﻿@page "/paquetes"
+﻿@page "/PaquetesIndex"
+@layout MainLayoutAdmin
 @inject PaquetesService paquetesService
 @rendermode InteractiveServer
 
-<div class="page-title">
+<SectionContent SectionName="TituloPagina">
     <h1>PAQUETES</h1>
-</div>
+</SectionContent>
 
 <div class="glass-container">
 
@@ -33,8 +34,6 @@
         <div class="col-cell">Total</div>
         <div class="vertical-line"></div>
         <div class="col-cell">Condición</div>
-        <div class="vertical-line"></div>
-        <div class="col-cell small">Retenido</div>
     </div>
 
     <div class="rows-container">
@@ -43,54 +42,6 @@
             <div class="data-row justify-content-center">
                 <span class="text-muted">No hay paquetes registrados.</span>
             </div>
-        }
-        else
-        {
-            @foreach (var item in ListaPaquetes)
-            {
-                // Lógica temporal para estatus (ya que no está en la BD)
-                // Si está retenido, ponemos estatus rojo, si no, verde.
-                var estatusSimulado = item.Retenido ? "Aduanas" : "Disponible";
-
-                <div class="data-row">
-                    <div class="col-cell bold" style="color: @GetStatusColor(estatusSimulado)">
-                        @item.NumeroRecepcion
-                    </div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell">@DateTime.Now.ToString("MM/dd/yyyy")</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell wide">@item.NumeroTracking</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell">@item.Suplidor</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell">@item.Contenido</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell small">@item.Peso.ToString("N2")</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell status-col" style="color: @GetStatusColor(estatusSimulado)">
-                        <i class="@GetStatusIcon(estatusSimulado) status-icon"></i>
-                        <span>@estatusSimulado</span>
-                    </div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell">@item.Categoria</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell">@item.Total.ToString("N2")</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell">@(item.CondicionEspecial ? "Especial" : "Normal")</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell small">@(item.Retenido ? "Si" : "No")</div>
-                </div>
-            }
         }
     </div>
 </div>

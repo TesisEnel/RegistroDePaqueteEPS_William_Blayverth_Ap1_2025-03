@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RegistroDePaqueteEPS.Components;
 using RegistroDePaqueteEPS.DAL;
+using RegistroDePaqueteEPS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddRazorComponents()
 
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlite(ConStr));
+
+builder.Services.AddScoped<PaquetesService>();
 
 var app = builder.Build();
 

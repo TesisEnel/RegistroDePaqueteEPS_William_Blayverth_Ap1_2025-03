@@ -1,9 +1,13 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Sections
 
 <div class="page">
     <header class="top-header">
         <div class="logo-container">
             <img src="/Imagenes/EPS_Barra_Superior.png" alt="EPS Logo" class="logo-img" />
+        </div>
+        <div class="header-title-container">
+            <SectionOutlet SectionName="TituloPagina" />
         </div>
     </header>
 
@@ -20,13 +24,13 @@
                 </div>
                 <div>
                     <a href="https://www.eps.com.do/terminos-condiciones-y-politica-de-privacidad" class="footer-link" target="_blank">
-                        Terminos,condiciones y politica de privacidad
+                        Terminos, condiciones y politica de privacidad
                     </a>
                 </div>
             </div>
         </main>
         <aside class="sidebar-container">
-            <NavMenu />
+            <NavMenuAdmin />
         </aside>
     </div>
 </div>

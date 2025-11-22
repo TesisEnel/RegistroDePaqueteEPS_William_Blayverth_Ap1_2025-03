@@ -20,7 +20,7 @@
 }
 
 .logo-img {
-    max-height: 80px;
+    max-height: 70px;
     width: auto;
 }
 
@@ -99,4 +99,22 @@
     .top-header {
         height: 80px;
     }
+}
+.header-title-container {
+    flex: 1; /* Toma todo el espacio disponible entre el logo y el final */
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;
+    padding-right: 250px
+}
+
+/* Estilos para el H1 que vendrá desde las páginas */
+::deep h1 {
+    margin: 0;
+    font-family: 'Jaldi', sans-serif;
+    font-weight: 700;
+    font-size: 40px; /* Tamaño grande y visible */
+    color: #006089; /* El azul de tu marca */
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
