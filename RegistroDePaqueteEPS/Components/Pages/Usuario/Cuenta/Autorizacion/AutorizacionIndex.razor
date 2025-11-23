@@ -1,0 +1,100 @@
+﻿@page "/CuentaAdmin/autorizados"
+@rendermode InteractiveServer
+
+<SectionContent SectionName="TituloPagina">
+    <h1>CUENTA</h1>
+</SectionContent>
+
+<div class="glass-container authorized-view">
+
+    <div class="sub-nav-bar">
+        <NavLink class="sub-nav-item" href="/CuentaAdmin" Match="NavLinkMatch.All">Perfil</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item" href="/CuentaAdmin/direcciones">Direcciones</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item active" href="/CuentaAdmin/autorizados">Autorizados</NavLink>
+    </div>
+
+    <div class="content-wrapper">
+
+        <div class="header-section">
+            <h3 class="section-title">Personas Autorizadas</h3>
+            <a href="/CuentaAdmin/autorizados/create" class="btn-add text-decoration-none">
+                <i class="bi bi-plus-circle-fill"></i> Nuevo Autorizado
+            </a>
+        </div>
+
+        <div class="cards-grid">
+            @foreach (var persona in ListaAutorizados)
+            {
+                <div class="address-card">
+                    <div class="card-header">
+                        <div class="icon-box">
+                            <i class="bi bi-person-vcard-fill"></i>
+                        </div>
+                        <span class="alias-text">@persona.Nombre</span>
+
+                        @if (persona.Activo)
+                        {
+                            <span class="badge-main" style="background-color: #0BC8A2;">Activo</span>
+                        }
+                    </div>
+
+                    <div class="card-body">
+                        <p><strong>Cédula:</strong> @persona.Cedula</p>
+                        <p><strong>Parentesco:</strong> @persona.Parentesco</p>
+                        <p><strong>Teléfono:</strong> @persona.Telefono</p>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn-icon edit" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn-icon delete" title="Eliminar">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+@code {
+    // Modelo para Autorizados
+    public class AutorizadoViewModel
+    {
+        public string Nombre { get; set; }
+        public string Cedula { get; set; }
+        public string Parentesco { get; set; } // Ej: Hermano, Esposa
+        public string Telefono { get; set; }
+        public bool Activo { get; set; }
+    }
+
+    public List<AutorizadoViewModel> ListaAutorizados { get; set; } = new List<AutorizadoViewModel>();
+
+    protected override void OnInitialized()
+    {
+        // Datos de prueba simulados
+        ListaAutorizados.Add(new AutorizadoViewModel
+        {
+            Nombre = "Maria Perez",
+            Cedula = "402-1234567-8",
+            Parentesco = "Esposa",
+            Telefono = "809-555-1234",
+            Activo = true
+        });
+
+        ListaAutorizados.Add(new AutorizadoViewModel
+        {
+            Nombre = "Jose Rodriguez",
+            Cedula = "001-9876543-2",
+            Parentesco = "Hermano",
+            Telefono = "829-555-5678",
+            Activo = true
+        });
+    }
+}

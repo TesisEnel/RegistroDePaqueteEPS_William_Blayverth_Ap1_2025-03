@@ -1,5 +1,108 @@
-﻿<h3>DireccionIndex</h3>
+﻿@page "/Cuenta/direcciones"
+@rendermode InteractiveServer
+
+
+<SectionContent SectionName="TituloPagina">
+    <h1>CUENTA</h1>
+</SectionContent>
+
+<div class="glass-container addresses-view">
+
+    <div class="sub-nav-bar">
+        <NavLink class="sub-nav-item" href="/cuenta" Match="NavLinkMatch.All">Perfil</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item" href="/cuenta/direcciones">Direcciones</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item" href="/cuenta/autorizados">Autorizados</NavLink>
+    </div>
+
+    <div class="addresses-content">
+
+        <div class="header-section">
+            <h3 class="section-title">Mis Direcciones</h3>
+            <button class="btn-add">
+                <i class="bi bi-plus-circle-fill" href="/CuentaAdmin/direcciones/create"></i> Nueva Dirección
+            </button>
+        </div>
+
+        <div class="cards-grid">
+            @foreach (var dir in ListaDirecciones)
+            {
+                <div class="address-card">
+                    <div class="card-header">
+                        <div class="icon-box">
+                            <i class="bi @(dir.Tipo == "Trabajo" ? "bi-building" : "bi-house-door-fill")"></i>
+                        </div>
+                        <span class="alias-text">@dir.Alias</span>
+
+                        @if (dir.EsPrincipal)
+                        {
+                            <span class="badge-main">Principal</span>
+                        }
+                    </div>
+
+                    <div class="card-body">
+                        <p><strong>Calle:</strong> @dir.Calle</p>
+                        <p><strong>Número:</strong> @dir.Numero</p>
+                        <p><strong>Sector:</strong> @dir.Sector</p>
+                        <p><strong>Ciudad:</strong> @dir.Ciudad</p>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn-icon edit" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn-icon delete" title="Eliminar">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
 
 @code {
+    // Modelo temporal para visualización
+    public class DireccionViewModel
+    {
+        public string Alias { get; set; }
+        public string Calle { get; set; }
+        public string Numero { get; set; }
+        public string Sector { get; set; }
+        public string Ciudad { get; set; }
+        public string Tipo { get; set; } // "Casa" o "Trabajo"
+        public bool EsPrincipal { get; set; }
+    }
 
+    public List<DireccionViewModel> ListaDirecciones { get; set; } = new List<DireccionViewModel>();
+
+    protected override void OnInitialized()
+    {
+        // Datos de prueba para que se vea igual a tu imagen mental
+        ListaDirecciones.Add(new DireccionViewModel
+        {
+            Alias = "Casa",
+            Calle = "Calle Principal",
+            Numero = "#45",
+            Sector = "Los Prados",
+            Ciudad = "Santo Domingo",
+            Tipo = "Casa",
+            EsPrincipal = true
+        });
+
+        ListaDirecciones.Add(new DireccionViewModel
+        {
+            Alias = "Oficina",
+            Calle = "Av. Winston Churchill",
+            Numero = "Torre Empresarial, Piso 4",
+            Sector = "Piantini",
+            Ciudad = "Santo Domingo",
+            Tipo = "Trabajo",
+            EsPrincipal = false
+        });
+    }
 }

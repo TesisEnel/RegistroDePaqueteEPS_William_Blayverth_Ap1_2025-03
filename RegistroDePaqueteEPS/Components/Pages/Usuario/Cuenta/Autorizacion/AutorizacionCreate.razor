@@ -1,5 +1,92 @@
-﻿<h3>AutorizacionCreate</h3>
+﻿@page "/CuentaAdmin/autorizados/create"
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<SectionContent SectionName="TituloPagina">
+    <h1>CUENTA</h1>
+</SectionContent>
+
+<div class="glass-container create-authorized-view">
+
+    <div class="sub-nav-bar">
+        <NavLink class="sub-nav-item" href="/CuentaAdmin">Perfil</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item" href="/CuentaAdmin/direcciones">Direcciones</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item active" href="/CuentaAdmin/autorizados">Autorizados</NavLink>
+    </div>
+
+    <div class="form-content">
+        <h3 class="section-title">Nueva Persona Autorizada</h3>
+
+        <EditForm Model="NuevoAutorizado" OnValidSubmit="GuardarAutorizado">
+            <DataAnnotationsValidator />
+
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Nombre Completo</label>
+                    <InputText @bind-Value="NuevoAutorizado.Nombre" class="input-box" placeholder="Nombre y Apellido" />
+                </div>
+                <div class="input-group">
+                    <label>Cédula</label>
+                    <InputText @bind-Value="NuevoAutorizado.Cedula" class="input-box" placeholder="000-0000000-0" />
+                </div>
+
+                <div class="input-group">
+                    <label>Parentesco</label>
+                    <InputText @bind-Value="NuevoAutorizado.Parentesco" class="input-box" placeholder="Ej: Hermano, Esposa" />
+                </div>
+                <div class="input-group">
+                    <label>Teléfono</label>
+                    <InputText @bind-Value="NuevoAutorizado.Telefono" class="input-box" placeholder="809-000-0000" />
+                </div>
+            </div>
+
+            <div class="options-row">
+                <div class="checkbox-group">
+                    <label class="switch">
+                        <InputCheckbox @bind-Value="NuevoAutorizado.Activo" />
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="checkbox-label">Autorizado Activo</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn-cancel" @onclick="Cancelar">Cancelar</button>
+                <button type="submit" class="btn-save">Guardar</button>
+            </div>
+
+        </EditForm>
+    </div>
+
+</div>
 
 @code {
+    // Modelo para el formulario
+    public class AutorizadoForm
+    {
+        public string Nombre { get; set; }
+        public string Cedula { get; set; }
+        public string Parentesco { get; set; }
+        public string Telefono { get; set; }
+        public bool Activo { get; set; } = true; // Por defecto activo al crear
+    }
 
+    public AutorizadoForm NuevoAutorizado { get; set; } = new AutorizadoForm();
+
+    private void GuardarAutorizado()
+    {
+        // Aquí llamarías a tu servicio: await autorizadosService.Guardar(NuevoAutorizado);
+
+        // Redirigir a la lista de autorizados
+        NavManager.NavigateTo("/CuentaAdmin/autorizados");
+    }
+
+    private void Cancelar()
+    {
+        NavManager.NavigateTo("/CuentaAdmin/autorizados");
+    }
 }

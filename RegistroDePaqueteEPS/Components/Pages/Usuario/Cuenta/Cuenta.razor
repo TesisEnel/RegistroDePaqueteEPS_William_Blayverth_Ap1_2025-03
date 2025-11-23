@@ -1,5 +1,53 @@
-﻿<h3>Cuenta</h3>
+﻿@page "/Cuenta"
+@rendermode InteractiveServer
 
-@code {
+<SectionContent SectionName="TituloPagina">
+    <h1>CUENTA</h1>
+</SectionContent>
 
-}
+<div class="glass-container profile-view">
+
+    <div class="sub-nav-bar">
+        <NavLink class="sub-nav-item" href="/CuentaAdmin" Match="NavLinkMatch.All">Perfil</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item" href="/CuentaAdmin/direcciones">Direcciones</NavLink>
+        <div class="separator"></div>
+
+        <NavLink class="sub-nav-item" href="/cuenta/autorizados">Autorizados</NavLink>
+    </div>
+
+    <div class="profile-content">
+        <h3 class="section-title">Datos Personales</h3>
+
+        <div class="form-grid">
+            <div class="input-group">
+                <label>Nombre</label>
+                <div class="data-box">William</div>
+            </div>
+            <div class="input-group">
+                <label>Apellido</label>
+                <div class="data-box">Rodriguez</div>
+            </div>
+
+            <div class="input-group">
+                <label>Correo</label>
+                <div class="data-box">william@ejemplo.com</div>
+            </div>
+            <div class="input-group">
+                <label>Teléfono</label>
+                <div class="data-box">809-555-5555</div>
+            </div>
+
+            <div class="input-group">
+                <label>Cédula</label>
+                <div class="data-box">402-0000000-0</div>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <button class="btn-save">Guardar Cambios</button>
+        </div>
+    </div>
+
+</div>
