@@ -1,5 +1,6 @@
-﻿@page "/preavisousuario/create"
+﻿@page "/preavisousuario/upsert/{PreavisoId:int}"
 @inject NavigationManager NavManager
+@inject PreavisosService preavisosService
 @rendermode InteractiveServer
 
 <SectionContent SectionName="TituloPagina">
@@ -15,19 +16,27 @@
     </div>
 
     <div class="form-content">
-        <h3 class="section-title">Registrar Nuevo Paquete</h3>
+        <h3 class="section-title">@Estado Preaviso</h3>
 
-        <EditForm Model="NuevoPreAviso" OnValidSubmit="GuardarPreAviso">
+        <EditForm Model="Preaviso" OnValidSubmit="GuardarPreaviso">
             <DataAnnotationsValidator />
 
             <div class="form-grid">
                 <div class="input-group">
                     <label>Tracking Number</label>
-                    <InputText @bind-Value="NuevoPreAviso.Tracking" class="input-box" placeholder="Ej: 1Z999..." />
+                    <InputText @bind-Value="Preaviso.NumeroTracking" class="input-box" placeholder="Ej: 1Z999..." />
+                    <ValidationMessage For="@(() => Preaviso.NumeroTracking)"/>
                 </div>
+
+                <div class="input-group">
+                    <label>Tienda</label>
+                    <InputText @bind-Value="Preaviso.Tienda" class="input-box" placeholder="Ej: Amazon, Shein" />
+                    <ValidationMessage For="@(() => Preaviso.Tienda)" />
+                </div>
+
                 <div class="input-group">
                     <label>Transportista</label>
-                    <InputSelect @bind-Value="NuevoPreAviso.Transportista" class="input-box">
+                    <InputSelect @bind-Value="Preaviso.Transportista" class="input-box">
                         <option value="">Seleccione...</option>
                         <option value="Amazon Logistics">Amazon Logistics</option>
                         <option value="UPS">UPS</option>
@@ -40,17 +49,15 @@
                 </div>
 
                 <div class="input-group">
-                    <label>Tienda / Suplidor</label>
-                    <InputText @bind-Value="NuevoPreAviso.Tienda" class="input-box" placeholder="Ej: Amazon, Shein" />
-                </div>
-                <div class="input-group">
-                    <label>Valor (USD)</label>
-                    <InputNumber @bind-Value="NuevoPreAviso.Valor" class="input-box" placeholder="0.00" />
+                    <label>Contenido</label>
+                    <InputText @bind-Value="Preaviso.Contenido" class="input-box" placeholder="Ej: Ropa, Zapatos" />
+                    <ValidationMessage For="@(() => Preaviso.Contenido)" />
                 </div>
 
                 <div class="input-group">
-                    <label>Contenido</label>
-                    <InputText @bind-Value="NuevoPreAviso.Contenido" class="input-box" placeholder="Ej: Ropa, Zapatos" />
+                    <label>Valor (USD)</label>
+                    <InputNumber @bind-Value="Preaviso.Valor" class="input-box" placeholder="0.00" />
+                    <ValidationMessage For="@(() => Preaviso.Valor)" />
                 </div>
 
                 <div class="input-group">
@@ -64,8 +71,8 @@
             </div>
 
             <div class="action-buttons">
-                <button type="button" class="btn-cancel" @onclick="Cancelar">Cancelar</button>
-                <button type="submit" class="btn-save">Crear Pre-Aviso</button>
+                <a href="/preavisousuario" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Guardar Pre-Aviso</button>
             </div>
 
         </EditForm>
@@ -74,27 +81,27 @@
 </div>
 
 @code {
-    public class PreAvisoForm
+    [Parameter]
+    public int PreavisoId{ get; set; }
+    public Preavisos Preaviso { get; set; } = new Preavisos();
+    public string Estado { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Tracking { get; set; }
-        public string Transportista { get; set; }
-        public string Tienda { get; set; }
-        public decimal Valor { get; set; }
-        public string Contenido { get; set; }
-        // El peso no suele ser obligatorio en pre-aviso (lo pone la transportadora)
+        if (PreavisoId > 0)
+        {
+            Estado = "Editar";
+            Preaviso = await preavisosService.Buscar(PreavisoId);
+        }
+        else
+            Estado = "Crear";
     }
 
-    public PreAvisoForm NuevoPreAviso { get; set; } = new PreAvisoForm();
-
-    private void GuardarPreAviso()
+    private async Task GuardarPreaviso()
     {
-        // Lógica de guardado...
-        NavManager.NavigateTo("/preavisousario");
-    }
-
-    private void Cancelar()
-    {
-        NavManager.NavigateTo("/preavisousuario");
+        var modificado = await preavisosService.Guardar(Preaviso);
+        if(modificado)
+            NavManager.NavigateTo("/preavisousuario");
     }
 
     private void ManejarArchivo(InputFileChangeEventArgs e)

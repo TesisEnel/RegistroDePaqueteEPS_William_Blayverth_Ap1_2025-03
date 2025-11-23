@@ -1,5 +1,4 @@
 ﻿@page "/paquetesusuario"
-@layout MainLayoutUsuario
 @inject PaquetesService paquetesService
 @rendermode InteractiveServer
 
@@ -10,23 +9,34 @@
 <div class="glass-container">
 
     <div class="table-header-row">
+
         <div class="col-cell"># Recepción</div>
         <div class="vertical-line"></div>
+
         <div class="col-cell">Fecha</div>
         <div class="vertical-line"></div>
+
         <div class="col-cell wide"># Tracking</div>
         <div class="vertical-line"></div>
+
         <div class="col-cell">Suplidor</div>
         <div class="vertical-line"></div>
+
         <div class="col-cell">Contenido</div>
         <div class="vertical-line"></div>
+
         <div class="col-cell small">Peso</div>
         <div class="vertical-line"></div>
+
         <div class="col-cell">Estatus</div>
         <div class="vertical-line"></div>
-        <div class="col-cell">Servicio</div> <div class="vertical-line"></div>
+
+        <div class="col-cell">Servicio</div>
+        <div class="vertical-line"></div>
+
         <div class="col-cell">Total</div>
         <div class="vertical-line"></div>
+
         <div class="col-cell">Condición</div>
     </div>
 
@@ -45,7 +55,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Usamos tu servicio real para buscar los datos en la BD
         ListaPaquetes = await paquetesService.Listar(p => p.PaqueteId > 0);
     }
 

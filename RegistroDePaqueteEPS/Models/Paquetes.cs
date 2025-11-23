@@ -22,7 +22,7 @@ public class Paquetes
     [Range(0.01, double.MaxValue, ErrorMessage = "El peso debe ser mayor que cero")]
     public double Peso {  get; set; }
 
-    [Required(ErrorMessage = "El peso es requerido")]
+    [Required(ErrorMessage = "El total es requerido")]
     [Range(0.01, double.MaxValue, ErrorMessage = "El peso debe ser mayor que cero")]
     public double Total { get; set; }
 

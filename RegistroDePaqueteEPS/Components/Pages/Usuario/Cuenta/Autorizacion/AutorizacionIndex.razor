@@ -65,7 +65,7 @@
 
 @code {
     // Modelo para Autorizados
-    public class AutorizadoViewModel
+    public class AutorizadosEntrega
     {
         public string Nombre { get; set; }
         public string Cedula { get; set; }
@@ -74,12 +74,12 @@
         public bool Activo { get; set; }
     }
 
-    public List<AutorizadoViewModel> ListaAutorizados { get; set; } = new List<AutorizadoViewModel>();
+    public List<AutorizadosEntrega> ListaAutorizados { get; set; } = new List<AutorizadosEntrega>();
 
     protected override void OnInitialized()
     {
         // Datos de prueba simulados
-        ListaAutorizados.Add(new AutorizadoViewModel
+        ListaAutorizados.Add(new AutorizadosEntrega
         {
             Nombre = "Maria Perez",
             Cedula = "402-1234567-8",
@@ -88,7 +88,7 @@
             Activo = true
         });
 
-        ListaAutorizados.Add(new AutorizadoViewModel
+        ListaAutorizados.Add(new AutorizadosEntrega
         {
             Nombre = "Jose Rodriguez",
             Cedula = "001-9876543-2",

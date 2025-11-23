@@ -1,5 +1,6 @@
 ﻿@page "/preavisousuario"
 @inject NavigationManager NavManager
+@inject PreavisosService preavisosService
 @rendermode InteractiveServer
 
 <SectionContent SectionName="TituloPagina">
@@ -9,76 +10,78 @@
 <div class="glass-container preaviso-view">
 
     <div class="top-actions">
-        <a href="/preavisousuario/create" class="btn-new">
+        <a href="/preavisousuario/upsert/0" class="btn-new">
             <i class="bi bi-plus-lg"></i> Nuevo Pre-Aviso
         </a>
     </div>
 
     <div class="table-header-row">
-        <div class="col-cell wide">Tracking</div>
+        <div class="col-cell">Fecha</div>
         <div class="vertical-line"></div>
 
-        <div class="col-cell">Transportista</div>
+        <div class="col-cell wide">Tracking</div>
         <div class="vertical-line"></div>
 
         <div class="col-cell">Tienda</div>
         <div class="vertical-line"></div>
 
-        <div class="col-cell">Valor</div>
+        <div class="col-cell">Transportista</div>
         <div class="vertical-line"></div>
 
         <div class="col-cell">Contenido</div>
         <div class="vertical-line"></div>
 
-        <div class="col-cell small">Peso</div>
-        <div class="vertical-line"></div>
-
-        <div class="col-cell">Fecha</div>
+        <div class="col-cell">Valor</div>
         <div class="vertical-line"></div>
 
         <div class="col-cell small">Acciones</div>
     </div>
+    <div class="rows-container">
+        @if (ListaPreavisos.Count == 0)
+        {
+            <div class="data-row justify-content-center">
+                <span class="text-muted">No hay paquetes registrados.</span>
+            </div>
+        }
+        else
+        {
+            @foreach(Preavisos PreAviso in ListaPreavisos)
+            {
+                <div class="data-row justify-content-center">
 
+                    <div class="col-cell">@PreAviso.Fecha</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell wide">@PreAviso.NumeroTracking</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">@PreAviso.Tienda</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">@PreAviso.Transportista</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">@PreAviso.Contenido</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">@PreAviso.Valor</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell small">
+                        <a href="preavisousuario/upsert/@PreAviso.PreavisoId" class="btn btn-outline-primary"><span class="bi bi-pencil"/></a>
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
 </div>
 
 @code {
-    // Modelo temporal para visualizar
-    public class PreAvisoViewModel
+    public List<Preavisos> ListaPreavisos { get; set; } = new List<Preavisos>();
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Tracking { get; set; }
-        public string Transportista { get; set; }
-        public string Tienda { get; set; }
-        public decimal Valor { get; set; }
-        public string Contenido { get; set; }
-        public double Peso { get; set; }
-        public DateTime Fecha { get; set; }
-    }
-
-    public List<PreAvisoViewModel> ListaPreAvisos { get; set; } = new List<PreAvisoViewModel>();
-
-    protected override void OnInitialized()
-    {
-        // Datos de prueba basados en tu imagen
-        ListaPreAvisos.Add(new PreAvisoViewModel
-        {
-            Tracking = "1Z999AA10123456784",
-            Transportista = "UPS",
-            Tienda = "Amazon",
-            Valor = 150.00m,
-            Contenido = "Ropa",
-            Peso = 2.5,
-            Fecha = DateTime.Now
-        });
-
-        ListaPreAvisos.Add(new PreAvisoViewModel
-        {
-            Tracking = "TBA098765432100",
-            Transportista = "Amazon Logistics",
-            Tienda = "Amazon",
-            Valor = 45.99m,
-            Contenido = "Zapatos",
-            Peso = 1.2,
-            Fecha = DateTime.Now.AddDays(-2)
-        });
+        ListaPreavisos = await preavisosService.Listar(p => p.PreavisoId > 0);
     }
 }
