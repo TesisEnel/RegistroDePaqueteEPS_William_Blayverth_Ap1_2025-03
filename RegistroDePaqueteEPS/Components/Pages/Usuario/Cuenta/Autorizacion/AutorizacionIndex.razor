@@ -21,7 +21,7 @@
 
         <div class="header-section">
             <h3 class="section-title">Personas Autorizadas</h3>
-            <a href="/cuenta/autorizados/create" class="btn-add text-decoration-none">
+            <a href="/cuenta/autorizados/upsert/0" class="btn-add text-decoration-none">
                 <i class="bi bi-plus-circle-fill"></i> Nuevo Autorizado
             </a>
         </div>
@@ -49,9 +49,9 @@
                     </div>
 
                     <div class="card-actions">
-                        <button class="btn-icon edit" title="Editar">
+                        <a href="/cuenta/autorizados/upsert/@persona.AutorizadoEntregaId">
                             <i class="bi bi-pencil-square"></i>
-                        </button>
+                        </a>
                         <button class="btn-icon delete" title="Eliminar">
                             <i class="bi bi-trash-fill"></i>
                         </button>
@@ -67,6 +67,7 @@
     // Modelo para Autorizados
     public class AutorizadosEntrega
     {
+        public int AutorizadoEntregaId { get; set; }
         public string Nombre { get; set; }
         public string Cedula { get; set; }
         public string Parentesco { get; set; } // Ej: Hermano, Esposa

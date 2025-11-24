@@ -27,12 +27,12 @@ public class PreavisosService(IDbContextFactory<Contexto> dbContext)
         return await contexto.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> Guardar(Preavisos paquete)
+    public async Task<bool> Guardar(Preavisos preaviso)
     {
-        if (!await Existe(paquete.PreavisoId))
-            return await Insertar(paquete);
+        if (!await Existe(preaviso.PreavisoId))
+            return await Insertar(preaviso);
         else
-            return await Modificar(paquete);
+            return await Modificar(preaviso);
     }
 
     public async Task<bool> Eliminar(int preavisoId)

@@ -11,6 +11,8 @@ public class Contexto : DbContext
 
     public DbSet<Preavisos> Preavisos { get; set; }
 
+    public DbSet<AutorizadosEntrega> AutorizadosEntrega { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Paquetes>(entity =>
