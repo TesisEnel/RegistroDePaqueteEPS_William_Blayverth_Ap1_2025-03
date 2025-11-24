@@ -13,6 +13,8 @@ public class Contexto : DbContext
 
     public DbSet<AutorizadosEntrega> AutorizadosEntrega { get; set; }
 
+    public DbSet<DireccionesDelivery> DireccionesDelivery { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Paquetes>(entity =>

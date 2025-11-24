@@ -1,4 +1,5 @@
 ﻿@page "/cuenta/direcciones"
+@inject DireccionesDeliveryService direccionesDeliveryService
 @rendermode InteractiveServer
 
 <SectionContent SectionName="TituloPagina">
@@ -21,9 +22,9 @@
 
         <div class="header-section">
             <h3 class="section-title">Mis Direcciones</h3>
-            <button class="btn-add">
-                <i class="bi bi-plus-circle-fill" href="/cuenta/direcciones/create"></i> Nueva Dirección
-            </button>
+            <a href="/cuenta/direcciones/upsert/0" class="btn-add">
+                <i class="bi bi-plus-circle-fill"></i> Nueva Dirección
+            </a>
         </div>
 
         <div class="cards-grid">
@@ -31,31 +32,24 @@
             {
                 <div class="address-card">
                     <div class="card-header">
-                        <div class="icon-box">
-                            <i class="bi @(dir.Tipo == "Trabajo" ? "bi-building" : "bi-house-door-fill")"></i>
-                        </div>
                         <span class="alias-text">@dir.Alias</span>
 
-                        @if (dir.EsPrincipal)
+                        @if (dir.Principal)
                         {
                             <span class="badge-main">Principal</span>
                         }
                     </div>
 
                     <div class="card-body">
-                        <p><strong>Calle:</strong> @dir.Calle</p>
-                        <p><strong>Número:</strong> @dir.Numero</p>
                         <p><strong>Sector:</strong> @dir.Sector</p>
-                        <p><strong>Ciudad:</strong> @dir.Ciudad</p>
+                        <p><strong>Calle:</strong> @dir.Calle</p>
+                        <p><strong>Domicilio:</strong> @(dir.Domicilio ?? "N/A")</p>
+                        <p><strong>Referencias:</strong> @dir.Referencias</p>
                     </div>
 
                     <div class="card-actions">
-                        <button class="btn-icon edit" title="Editar">
-                            <a class="bi bi-pencil-square" href="/cuenta/direcciones/edit"></a>
-                        </button>
-                        <button class="btn-icon delete" title="Eliminar">
-                            <a class="bi bi-trash-fill" href="/cuenta/direcciones/edit"></a>
-                        </button>
+                         <a class="bi bi-pencil-square" href="/cuenta/direcciones/upsert/@dir.DireccionDeliveryId"><span class="btn-icon edit"/></a>
+                        <button class="btn-icon delete" title="Eliminar"/>
                     </div>
                 </div>
             }
@@ -65,43 +59,10 @@
 </div>
 
 @code {
-    // Modelo temporal para visualización
-    public class DireccionViewModel
+    public List<DireccionesDelivery> ListaDirecciones { get; set; } = new List<DireccionesDelivery>();
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Alias { get; set; }
-        public string Calle { get; set; }
-        public string Numero { get; set; }
-        public string Sector { get; set; }
-        public string Ciudad { get; set; }
-        public string Tipo { get; set; } // "Casa" o "Trabajo"
-        public bool EsPrincipal { get; set; }
-    }
-
-    public List<DireccionViewModel> ListaDirecciones { get; set; } = new List<DireccionViewModel>();
-
-    protected override void OnInitialized()
-    {
-        // Datos de prueba para que se vea igual a tu imagen mental
-        ListaDirecciones.Add(new DireccionViewModel
-        {
-            Alias = "Casa",
-            Calle = "Calle Principal",
-            Numero = "#45",
-            Sector = "Los Prados",
-            Ciudad = "Santo Domingo",
-            Tipo = "Casa",
-            EsPrincipal = true
-        });
-
-        ListaDirecciones.Add(new DireccionViewModel
-        {
-            Alias = "Oficina",
-            Calle = "Av. Winston Churchill",
-            Numero = "Torre Empresarial, Piso 4",
-            Sector = "Piantini",
-            Ciudad = "Santo Domingo",
-            Tipo = "Trabajo",
-            EsPrincipal = false
-        });
+        ListaDirecciones = await direccionesDeliveryService.Listar(d => d.DireccionDeliveryId > 0);
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegistroDePaqueteEPS.DAL;
 
@@ -10,9 +11,11 @@ using RegistroDePaqueteEPS.DAL;
 namespace RegistroDePaqueteEPS.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20251124040906_Quinta")]
+    partial class Quinta
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -53,10 +56,6 @@ namespace RegistroDePaqueteEPS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Alias")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("AutorizadoEntregaId")
                         .HasColumnType("INTEGER");
 
@@ -68,6 +67,7 @@ namespace RegistroDePaqueteEPS.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Domicilio")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Municipio")

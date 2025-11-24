@@ -15,6 +15,7 @@ builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlite(ConStr));
 builder.Services.AddScoped<PaquetesService>();
 builder.Services.AddScoped<PreavisosService>();
 builder.Services.AddScoped<AutorizadosEntregaService>();
+builder.Services.AddScoped<DireccionesDeliveryService>();
 
 var app = builder.Build();
 
