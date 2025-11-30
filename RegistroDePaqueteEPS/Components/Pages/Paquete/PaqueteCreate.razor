@@ -1,0 +1,115 @@
+﻿@page "/paquetesusuario/create"
+@inject NavigationManager NavManager
+@inject PaquetesService paquetesService
+@rendermode InteractiveServer
+
+<SectionContent SectionName="TituloPagina">
+    <h1>PAQUETES</h1>
+</SectionContent>
+
+<div class="glass-container create-paquete-view">
+
+    <div class="header-actions">
+        <a href="/paquetesusuario" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Regresar al Listado
+        </a>
+    </div>
+
+    <div class="form-content">
+        <h3 class="section-title">Registrar Nuevo Paquete</h3>
+
+        <EditForm Model="NuevoPaquete" OnValidSubmit="GuardarPaquete">
+            <DataAnnotationsValidator />
+
+            <div class="form-grid">
+
+                <div class="form-item">
+                    <label>Número de Tracking</label>
+                    <InputText @bind-Value="NuevoPaquete.NumeroTracking" class="input-box" placeholder="Ej: 1Z999..." />
+                    <ValidationMessage For="@(() => NuevoPaquete.NumeroTracking)" />
+                </div>
+
+                <div class="form-item">
+                    <label>Suplidor / Tienda</label>
+                    <InputText @bind-Value="NuevoPaquete.Suplidor" class="input-box" placeholder="Ej: Amazon" />
+                    <ValidationMessage For="@(() => NuevoPaquete.Suplidor)" />
+                </div>
+
+                <div class="form-item">
+                    <label>Contenido</label>
+                    <InputText @bind-Value="NuevoPaquete.Contenido" class="input-box" placeholder="Ej: Ropa, Electrónicos" />
+                    <ValidationMessage For="@(() => NuevoPaquete.Contenido)" />
+                </div>
+
+                <div class="form-item">
+                    <label>Peso (Libras)</label>
+                    <InputNumber @bind-Value="NuevoPaquete.Peso" class="input-box" placeholder="0.00" />
+                    <ValidationMessage For="@(() => NuevoPaquete.Peso)" />
+                </div>
+
+                <div class="form-item">
+                    <label>Valor Total (USD)</label>
+                    <InputNumber @bind-Value="NuevoPaquete.Total" class="input-box" placeholder="0.00" />
+                    <ValidationMessage For="@(() => NuevoPaquete.Total)" />
+                </div>
+
+                <div class="form-item">
+                    <label>Servicio / Categoría</label>
+                    <InputSelect @bind-Value="NuevoPaquete.Categoria" class="input-box">
+                        <option value="">Seleccione...</option>
+                        <option value="Priority">Priority</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Economy">Economy</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => NuevoPaquete.Categoria)" />
+                </div>
+
+                <div class="options-row">
+                    <div class="checkbox-group">
+                        <label class="switch">
+                            <InputCheckbox @bind-Value="NuevoPaquete.CondicionEspecial" />
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="checkbox-label">Condición Especial</span>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="switch">
+                            <InputCheckbox @bind-Value="NuevoPaquete.Retenido" />
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="checkbox-label">Retenido en Aduanas</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="action-buttons">
+                <a href="/paquetesusuario" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Guardar Paquete</button>
+            </div>
+
+        </EditForm>
+    </div>
+
+</div>
+
+@code {
+    public Paquetes NuevoPaquete { get; set; } = new Paquetes();
+
+    private async Task GuardarPaquete()
+    {
+        // Generamos un número de recepción automático si es nuevo (opcional)
+        if (string.IsNullOrEmpty(NuevoPaquete.NumeroRecepcion))
+        {
+            NuevoPaquete.NumeroRecepcion = "REC-" + DateTime.Now.ToString("yyyyMMddHHmm");
+        }
+
+        var guardado = await paquetesService.Guardar(NuevoPaquete);
+
+        if (guardado)
+        {
+            NavManager.NavigateTo("/paquetesusuario");
+        }
+    }
+}

@@ -125,3 +125,24 @@
         min-width: 1200px; /* Fuerza un ancho mínimo para que no se rompa */
     }
 }
+.top-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.btn-new {
+    background-color: #006089; /* Azul EPS */
+    color: white;
+    text-decoration: none;
+    padding: 10px 25px;
+    border-radius: 30px; /* Redondo */
+    font-family: 'Jaldi', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}

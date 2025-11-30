@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using RegistroDePaqueteEPS.Components;
 using RegistroDePaqueteEPS.Components.Account;
 using RegistroDePaqueteEPS.Data;
@@ -20,6 +21,7 @@ builder.Services.AddScoped<PaquetesService>();
 builder.Services.AddScoped<PreavisosService>();
 builder.Services.AddScoped<AutorizadosEntregaService>();
 builder.Services.AddScoped<DireccionesDeliveryService>();
+builder.Services.AddMudServices();
 
 builder.Services.AddAuthentication(options =>
     {
