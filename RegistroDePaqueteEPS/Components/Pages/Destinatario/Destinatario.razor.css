@@ -1,2 +1,158 @@
-﻿body {
+﻿/* Contenedor de Vidrio */
+.glass-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    padding: 30px;
+    min-height: 800px; /* Un poco más alto para ver la lista */
+    display: flex;
+    flex-direction: column;
+    margin: 0 20px;
+    position: relative; /* Para posicionar el buscador */
+}
+
+/* --- BARRA DE BÚSQUEDA --- */
+.search-bar-container {
+    display: flex;
+    justify-content: flex-end; /* A la derecha */
+    margin-bottom: 30px;
+    padding-right: 20px;
+}
+
+.search-box {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    width: 600px; /* Ancho grande según diseño */
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.search-icon {
+    font-size: 1.5rem;
+    color: #333;
+    margin-right: 15px;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    font-family: 'Jaldi', sans-serif;
+    font-size: 20px;
+    width: 100%;
+    color: #333;
+}
+
+/* --- TABLA (Filas Flotantes) --- */
+.table-header-row, .data-row {
+    display: flex;
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 30px; /* Redondo */
+    height: 60px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Encabezado */
+.table-header-row {
+    color: #006089;
+    font-weight: 700;
+    font-family: 'Jaldi', sans-serif;
+    font-size: 18px;
+    margin-top: 10px; /* Separación del buscador */
+}
+
+/* Celdas */
+.col-cell {
+    flex: 1;
+    text-align: center;
+    font-family: 'Jaldi', sans-serif;
+    font-size: 18px;
+    color: #006089;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 5px;
+}
+
+    /* Tamaños de columnas */
+    .col-cell.wide {
+        flex: 2;
+    }
+    /* Dirección más ancha */
+    .col-cell.small {
+        flex: 0.6;
+    }
+    /* Opciones y EPS más pequeños */
+    .col-cell.bold {
+        font-weight: 700;
+    }
+
+    .col-cell.email-text {
+        font-size: 16px;
+    }
+/* Email un poco más chico para que quepa */
+
+/* Separador Vertical */
+.vertical-line {
+    width: 1px;
+    height: 30px;
+    background-color: #000000;
+    opacity: 0.2;
+    margin: 0 5px;
+}
+
+/* Acciones */
+.actions-cell {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+    .btn-icon.edit {
+        color: #006089;
+    }
+
+    .btn-icon.delete {
+        color: #dc3545;
+    }
+
+    .btn-icon:hover {
+        transform: scale(1.2);
+    }
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    color: white;
+    font-family: 'Jaldi', sans-serif;
+    font-size: 24px;
+    padding: 20px;
+}
+
+/* Responsividad */
+@media (max-width: 1400px) {
+    .rows-container {
+        overflow-x: auto;
+    }
+
+    .table-header-row, .data-row {
+        min-width: 1200px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+    /* Buscador adaptable */
 }

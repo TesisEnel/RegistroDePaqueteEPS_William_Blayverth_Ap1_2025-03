@@ -1,3 +1,111 @@
 ﻿@page "/destinatario"
-@inject PaquetesService paquetesService
+@attribute [Authorize(Roles = "Admin")]
+@* 👆 Solo Admin puede ver esto *@
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Sections
+@using RegistroDePaqueteEPS.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject UserManager<ApplicationUser> UserManager
 @rendermode InteractiveServer
+
+<SectionContent SectionName="TituloPagina">
+    <h1>DESTINATARIO</h1>
+</SectionContent>
+
+<div class="glass-container destinatario-view">
+
+    <div class="search-bar-container">
+        <div class="search-box">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" @bind="terminoBusqueda" @bind:event="oninput" placeholder="Buscar usuario..." />
+        </div>
+    </div>
+
+    <div class="table-header-row">
+        <div class="col-cell small">No. EPS</div>
+        <div class="vertical-line"></div>
+
+        <div class="col-cell">Nombre Completo</div>
+        <div class="vertical-line"></div>
+
+        <div class="col-cell">Identificación</div>
+        <div class="vertical-line"></div>
+
+        <div class="col-cell">Correo</div>
+        <div class="vertical-line"></div>
+
+        <div class="col-cell">Teléfono</div>
+        <div class="vertical-line"></div>
+
+        <div class="col-cell small">Opciones</div>
+    </div>
+
+    <div class="rows-container">
+        @if (UsuariosFiltrados.Count == 0)
+        {
+            <div class="empty-state">
+                <p>No se encontraron usuarios.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var user in UsuariosFiltrados)
+            {
+                <div class="data-row">
+                    <div class="col-cell small bold">@user.Id.Substring(0, 5)...</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">@(user.NombreCompleto ?? "N/A")</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">@(user.Identificacion ?? "N/A")</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell email-text">@user.Email</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell wide">@(user.Provincia ?? "N/A")</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">@(user.PhoneNumber ?? "N/A")</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell small actions-cell">
+                        <button class="btn-icon edit" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn-icon delete" title="Eliminar">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+</div>
+
+@code {
+    private List<ApplicationUser> TodosLosUsuarios = new();
+    private string terminoBusqueda = "";
+
+    // Propiedad calculada para filtrar
+    private List<ApplicationUser> UsuariosFiltrados =>
+        string.IsNullOrWhiteSpace(terminoBusqueda)
+        ? TodosLosUsuarios
+        : TodosLosUsuarios.Where(u =>
+            (u.NombreCompleto?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.Email?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.Identificacion?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false)
+          ).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Cargar usuarios de la base de datos
+        // Nota: UserManager no tiene un método directo "ToList", hay que usar IQueryable
+        TodosLosUsuarios = await UserManager.Users.ToListAsync();
+    }
+}
