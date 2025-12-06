@@ -126,7 +126,7 @@
                     <Authorized>
                         <div class="modal-footer-actions">
                             <button type="button" class="btn-blue-cancel" @onclick="CerrarModal">Cancelar</button>
-                            <button type="button" class="btn-blue-save" @onclick="GuardarCambiosPaquete">Guardar Cambios</button>
+                            <button type="button" class="btn-blue-save" disabled=@actualizado @onclick="GuardarCambiosPaquete">Guardar Cambios</button>
                         </div>
                     </Authorized>
                 </AuthorizeView>
@@ -139,6 +139,7 @@
     public List<Paquetes> ListaPaquetes { get; set; } = new List<Paquetes>();
     public List<EstatusPaquete> ListaEstatus { get; set; }
     private ApplicationUser appUser;
+    private bool actualizado = true;
 
     // --- VARIABLES MODAL ---
     private bool mostrarModalEdicion = false;
@@ -168,7 +169,22 @@
 
     private void AbrirModalEdicion(Paquetes paqueteOriginal)
     {
-        PaqueteEnEdicion = paqueteOriginal;
+        PaqueteEnEdicion = new Paquetes
+        {
+            PaqueteId = paqueteOriginal.PaqueteId,
+            ClienteId = paqueteOriginal.ClienteId,
+            NumeroRecepcion = paqueteOriginal.NumeroRecepcion,
+            NumeroTracking = paqueteOriginal.NumeroTracking,
+            NumeroEPS = paqueteOriginal.NumeroEPS,
+            Suplidor = paqueteOriginal.Suplidor,
+            Contenido = paqueteOriginal.Contenido,
+            Peso = paqueteOriginal.Peso,
+            Total = paqueteOriginal.Total,
+            CondicionEspecial = paqueteOriginal.CondicionEspecial,
+            Categoria = paqueteOriginal.Categoria,
+            Retenido = paqueteOriginal.Retenido,
+            EstatusPaquete = paqueteOriginal.EstatusPaquete.ToList()
+        };
 
         mostrarModalEdicion = true;
     }
@@ -177,14 +193,15 @@
     {
         EstatusPaqueteDetalles EstatusPaquete = new EstatusPaqueteDetalles();
         EstatusPaquete.EstatusPaqueteId = PaqueteEnEdicion.EstatusPaquete.Count() + 1;
-        EstatusPaquete.Fecha = DateTime.Now;
         PaqueteEnEdicion.EstatusPaquete.Add(EstatusPaquete);
+        actualizado = false;
     }
 
     private void CerrarModal()
     {
         PaqueteEnEdicion = new Paquetes();
         mostrarModalEdicion = false;
+        actualizado = true;
     }
 
     private async Task GuardarCambiosPaquete()

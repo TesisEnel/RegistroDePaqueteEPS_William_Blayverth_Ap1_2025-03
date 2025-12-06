@@ -40,7 +40,7 @@ public class PaquetesService (IDbContextFactory<ApplicationDbContext> dbContext)
             .AsNoTracking()
             .SingleOrDefaultAsync(e => e.PaqueteId == paquete.PaqueteId);
 
-        if(original != null) return true;
+        if(original == null) return false;
 
         await AfectarExistencia(original.EstatusPaquete.ToArray(), TipoOperacion.Resta);
 

@@ -1,6 +1,9 @@
 ﻿@page "/cuenta/direcciones/upsert/{DireccionDeliveryId:int}"
 @inject DireccionesDeliveryService direccionesDeliveryService
+@inject AutorizadosEntregaService autorizadosEntregaService
 @inject NavigationManager NavManager
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 
 <SectionContent SectionName="TituloPagina">
@@ -71,6 +74,17 @@
                 </div>
 
                 <div class="form-item">
+                    <label>Transportista</label>
+                    <select class="input-box" @bind="Direccion.AutorizadoEntregaId">
+                        <option selected disabled value="">Seleccione...</option>
+                        @foreach(AutorizadosEntrega autorizado in AutorizadosEntrega)
+                        {
+                            <option value="@autorizado.AutorizadoEntregaId">@autorizado.Nombres</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-item">
                     <label>Alias (Ej: Casa, Oficina)</label>
                     <input type="text" class="input-box"
                            @bind-value="Direccion.Alias"
@@ -102,12 +116,14 @@
 @code {
     [Parameter]
     public int DireccionDeliveryId { get; set; }
-
     public DireccionesDelivery Direccion { get; set; } = new DireccionesDelivery();
     public string Estado { get; set; } = "Agregar";
+    private ApplicationUser appUser;
+    public List<AutorizadosEntrega> AutorizadosEntrega { get; set; } = new List<AutorizadosEntrega>();
 
     protected override async Task OnInitializedAsync()
     {
+        AutorizadosEntrega = await autorizadosEntregaService.Listar(a => a.AutorizadoEntregaId > 0);
         if (DireccionDeliveryId > 0)
         {
             Estado = "Editar";
@@ -117,6 +133,19 @@
 
     private async Task GuardarDireccion()
     {
+        if(DireccionDeliveryId == 0)
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var userClaimsPrincipal = authState.User;
+
+            if (userClaimsPrincipal.Identity.IsAuthenticated)
+            {
+                appUser = await UserManager.GetUserAsync(userClaimsPrincipal);
+            }
+
+            Direccion.ClienteId = appUser.Id;
+        }
+        
         var modificado = await direccionesDeliveryService.Guardar(Direccion);
         if (modificado)
             NavManager.NavigateTo("/cuenta/direcciones");
