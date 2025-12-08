@@ -83,6 +83,7 @@
         if (eliminado)
         {
             Console.WriteLine("Direccion Eliminada");
+            ListaAutorizados = await autorizadosEntregaService.Listar(a => a.AutorizadoEntregaId > 0);
         }
     }
 }

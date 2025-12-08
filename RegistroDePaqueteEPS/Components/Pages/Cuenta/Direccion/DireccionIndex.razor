@@ -87,6 +87,7 @@
         if(eliminado)
         {
             Console.WriteLine("Direccion Eliminada");
+            ListaDirecciones = await direccionesDeliveryService.Listar(d => d.DireccionDeliveryId > 0);
         }
     }
 }
