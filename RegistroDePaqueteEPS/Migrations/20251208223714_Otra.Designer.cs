@@ -11,7 +11,7 @@ using RegistroDePaqueteEPS.Data;
 namespace RegistroDePaqueteEPS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251201224313_Otra")]
+    [Migration("20251208223714_Otra")]
     partial class Otra
     {
         /// <inheritdoc />
@@ -484,8 +484,6 @@ namespace RegistroDePaqueteEPS.Migrations
 
                     b.HasIndex("ClienteId");
 
-                    b.HasIndex("PreavisoId");
-
                     b.ToTable("Paquetes");
                 });
 
@@ -528,7 +526,8 @@ namespace RegistroDePaqueteEPS.Migrations
 
                     b.HasIndex("ClienteId");
 
-                    b.HasIndex("PaqueteId");
+                    b.HasIndex("PaqueteId")
+                        .IsUnique();
 
                     b.ToTable("Preavisos");
                 });
@@ -649,7 +648,7 @@ namespace RegistroDePaqueteEPS.Migrations
                     b.HasOne("RegistroDePaqueteEPS.Models.AutorizadosEntrega", "AutorizadoEntrega")
                         .WithMany()
                         .HasForeignKey("AutorizadoEntregaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("RegistroDePaqueteEPS.Data.ApplicationUser", "Cliente")
@@ -680,13 +679,7 @@ namespace RegistroDePaqueteEPS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RegistroDePaqueteEPS.Models.Preavisos", "Preaviso")
-                        .WithMany()
-                        .HasForeignKey("PreavisoId");
-
                     b.Navigation("Cliente");
-
-                    b.Navigation("Preaviso");
                 });
 
             modelBuilder.Entity("RegistroDePaqueteEPS.Models.Preavisos", b =>
@@ -698,8 +691,8 @@ namespace RegistroDePaqueteEPS.Migrations
                         .IsRequired();
 
                     b.HasOne("RegistroDePaqueteEPS.Models.Paquetes", "Paquete")
-                        .WithMany()
-                        .HasForeignKey("PaqueteId");
+                        .WithOne("Preaviso")
+                        .HasForeignKey("RegistroDePaqueteEPS.Models.Preavisos", "PaqueteId");
 
                     b.Navigation("Cliente");
 
@@ -709,6 +702,9 @@ namespace RegistroDePaqueteEPS.Migrations
             modelBuilder.Entity("RegistroDePaqueteEPS.Models.Paquetes", b =>
                 {
                     b.Navigation("EstatusPaquete");
+
+                    b.Navigation("Preaviso")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

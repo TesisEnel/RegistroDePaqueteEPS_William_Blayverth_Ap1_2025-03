@@ -1,45 +1,42 @@
 ﻿@page "/destinatario"
 @attribute [Authorize(Roles = "Admin")]
-@* 👆 Solo Admin puede ver esto *@
 
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Sections
-@using RegistroDePaqueteEPS.Data
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.EntityFrameworkCore
+@using RegistroDePaqueteEPS.Data
+@using RegistroDePaqueteEPS.Models
+@using RegistroDePaqueteEPS.Services
 
 @inject UserManager<ApplicationUser> UserManager
+@inject PaquetesService paquetesService
+@inject DireccionesDeliveryService direccionesService
+@inject AutorizadosEntregaService autorizadosService
 @rendermode InteractiveServer
 
 <SectionContent SectionName="TituloPagina">
     <h1>DESTINATARIO</h1>
 </SectionContent>
 
-<div class="glass-container destinatario-view">
+<div class="glass-container">
 
     <div class="search-bar-container">
         <div class="search-box">
             <i class="bi bi-search search-icon"></i>
-            <input type="text" @bind="terminoBusqueda" @bind:event="oninput" placeholder="Buscar usuario..." />
+            @* Evento oninput para filtrar en tiempo real mientras escribes *@
+            <input type="text" @bind="terminoBusqueda" @bind:event="oninput" placeholder="Buscar por Nombre, EPS, Cédula..." />
         </div>
     </div>
 
     <div class="table-header-row">
         <div class="col-cell small">No. EPS</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Nombre Completo</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Identificación</div>
         <div class="vertical-line"></div>
-
+        <div class="col-cell">Teléfono</div> <div class="vertical-line"></div>
         <div class="col-cell">Correo</div>
         <div class="vertical-line"></div>
-
-        <div class="col-cell">Teléfono</div>
-        <div class="vertical-line"></div>
-
+        <div class="col-cell">Estado</div> <div class="vertical-line"></div>
         <div class="col-cell small">Opciones</div>
     </div>
 
@@ -54,8 +51,17 @@
         {
             @foreach (var user in UsuariosFiltrados)
             {
-                <div class="data-row">
-                    <div class="col-cell small bold">@user.Id.Substring(0, 5)...</div>
+                // Verificamos si está bloqueado
+                bool estaDeshabilitado = user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.Now;
+
+                // Estilo visual si está inactivo
+                <div class="data-row" style="@(estaDeshabilitado ? "opacity: 0.6; background-color: #f0f0f0;" : "")">
+
+                    <div class="col-cell small">
+                        <button class="btn-link-eps" @onclick="() => VerDetallesUsuario(user)">
+                            @user.UserName
+                        </button>
+                    </div>
                     <div class="vertical-line"></div>
 
                     <div class="col-cell">@(user.NombreCompleto ?? "N/A")</div>
@@ -64,48 +70,351 @@
                     <div class="col-cell">@(user.Identificacion ?? "N/A")</div>
                     <div class="vertical-line"></div>
 
-                    <div class="col-cell email-text">@user.Email</div>
-                    <div class="vertical-line"></div>
-
-                    <div class="col-cell wide">@(user.Provincia ?? "N/A")</div>
-                    <div class="vertical-line"></div>
-
                     <div class="col-cell">@(user.PhoneNumber ?? "N/A")</div>
                     <div class="vertical-line"></div>
 
+                    <div class="col-cell email-text">@user.Email</div>
+                    <div class="vertical-line"></div>
+
+                    <div class="col-cell">
+                        @if (estaDeshabilitado)
+                        {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                    </div>
+                    <div class="vertical-line"></div>
+
                     <div class="col-cell small actions-cell">
-                        <button class="btn-icon edit" title="Editar">
+                        <button class="btn-icon edit" title="Editar" @onclick="() => AbrirModalEdicion(user, true)">
                             <i class="bi bi-pencil-square"></i>
                         </button>
-                        <button class="btn-icon delete" title="Eliminar">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
+
+                        @if (estaDeshabilitado)
+                        {
+                            // Botón Reactivar
+                            <button class="btn-icon" style="color: #28a745;" title="Reactivar Usuario" @onclick="() => AbrirModalEdicion(user, false)">
+                                <i class="bi bi-person-check-fill"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            // Botón Deshabilitar
+                            <button class="btn-icon delete" title="Deshabilitar Usuario" @onclick="() => AbrirModalEdicion(user, false)">
+                                <i class="bi bi-person-slash"></i>
+                            </button>
+                        }
                     </div>
                 </div>
             }
         }
     </div>
-
 </div>
+
+@* --- 1. MODAL AZUL (EDICIÓN / CAMBIO DE ESTADO) --- *@
+@if (mostrarModalEdicion)
+{
+    <div class="modal-backdrop" @onclick="CerrarModales">
+        <div class="modal-window-edit" @onclick:stopPropagation>
+            <div class="eps-header">
+                <img src="/Imagenes/EPS_Barra_Superior.png" alt="EPS Logo" />
+                <button style="border:none; background:none; cursor:pointer;" @onclick="CerrarModales">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="eps-body">
+                @if (esModoEdicion)
+                {
+                    <h3>EDITAR USUARIO</h3>
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" @bind="usuarioEnEdicion.NombreCompleto" />
+                    </div>
+                    <div class="form-group">
+                        <label>Identificación</label>
+                        <input type="text" @bind="usuarioEnEdicion.Identificacion" />
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" @bind="usuarioEnEdicion.PhoneNumber" />
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn-eps-cancel" @onclick="CerrarModales">Cancelar</button>
+                        <button class="btn-eps-primary" @onclick="GuardarCambios">Guardar</button>
+                    </div>
+                }
+                else
+                {
+                    // Lógica para confirmar Deshabilitar o Reactivar
+                    bool estaBloqueado = usuarioEnEdicion.LockoutEnd.HasValue && usuarioEnEdicion.LockoutEnd.Value > DateTimeOffset.Now;
+
+                    if (estaBloqueado)
+                    {
+                        <h3>REACTIVAR USUARIO</h3>
+                        <p>¿Deseas reactivar al usuario <strong>@usuarioEnEdicion.NombreCompleto</strong>?</p>
+                        <p style="font-size: 0.9rem; opacity: 0.8;">El usuario podrá volver a acceder al sistema.</p>
+                        <div class="modal-actions">
+                            <button class="btn-eps-cancel" @onclick="CerrarModales">Cancelar</button>
+                            <button class="btn-eps-primary" style="color: #28a745;" @onclick="ConfirmarCambioEstado">Reactivar</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <h3>DESHABILITAR USUARIO</h3>
+                        <p>¿Marcar a <strong>@usuarioEnEdicion.NombreCompleto</strong> como inactivo?</p>
+
+                        <div class="alert alert-warning" style="color: #333; font-size: 0.9rem; margin-top: 10px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            Este usuario <strong>ya no pertenecerá a la empresa</strong> y perderá el acceso inmediatamente.
+                        </div>
+
+                        <div class="modal-actions">
+                            <button class="btn-eps-cancel" @onclick="CerrarModales">Cancelar</button>
+                            <button class="btn-eps-primary" style="color: #c00;" @onclick="ConfirmarCambioEstado">Deshabilitar</button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@* --- 2. MODAL GRIS (DETALLES COMPLETOS) --- *@
+@if (mostrarModalDetalle)
+{
+    <div class="modal-backdrop" @onclick="CerrarModales">
+        <div class="modal-card-gray" @onclick:stopPropagation>
+
+            <button class="btn-close-absolute" @onclick="CerrarModales"><i class="bi bi-x-lg"></i></button>
+
+            <i class="bi bi-person-fill detail-avatar"></i>
+            <h2 class="detail-name">@usuarioEnDetalle.NombreCompleto</h2>
+            <div class="detail-eps">@usuarioEnDetalle.UserName</div>
+
+            @if (usuarioEnDetalle.LockoutEnd.HasValue && usuarioEnDetalle.LockoutEnd.Value > DateTimeOffset.Now)
+            {
+                <div style="color: #dc3545; font-weight: bold; margin-bottom: 10px;">(USUARIO INACTIVO)</div>
+            }
+
+            <div class="detail-branch">EPS @(usuarioEnDetalle.Municipio ?? "Salcedo")</div>
+
+            <div class="details-grid">
+                <div class="detail-box">
+                    <h4>Direcciones</h4>
+                    @if (listaDirecciones.Any())
+                    {
+                        @foreach (var d in listaDirecciones)
+                        {
+                            <div style="margin-bottom:10px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
+                                <div class="detail-text">@d.Calle, @d.Sector</div>
+                                <div class="detail-text" style="font-size:0.8rem; color:#666;">@d.Provincia</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="detail-text">No hay direcciones.</p>
+                    }
+                </div>
+
+                <div class="detail-box">
+                    <h4>Autorizados</h4>
+                    @if (listaAutorizados.Any())
+                    {
+                        @foreach (var a in listaAutorizados)
+                        {
+                            <div style="margin-bottom:10px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
+                                <div class="detail-text">@a.Nombres</div>
+                                <div class="detail-text" style="font-size:0.8rem;">Tel: @a.Telefono</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="detail-text">No hay autorizados.</p>
+                    }
+                </div>
+            </div>
+
+            <div style="width:100%; margin-top:20px; background:rgba(255,255,255,0.6); padding:15px; border-radius:10px;">
+                <h4 style="text-align:center; color:#006080; margin-top:0;">PAQUETES REGISTRADOS</h4>
+                @if (listaPaquetes.Any())
+                {
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Recepción</th>
+                                <th>Tracking</th>
+                                <th>Contenido</th>
+                                <th>Estatus</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in listaPaquetes)
+                            {
+                                <tr>
+                                    <td>@p.NumeroRecepcion</td>
+                                    <td>@p.NumeroTracking</td>
+                                    <td>@p.Contenido</td>
+                                    <td>Disponible</td>
+                                    <td>$@p.Total</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="detail-text" style="text-align:center;">No tiene paquetes.</p>
+                }
+            </div>
+
+        </div>
+    </div>
+}
 
 @code {
     private List<ApplicationUser> TodosLosUsuarios = new();
     private string terminoBusqueda = "";
 
-    // Propiedad calculada para filtrar
+    // -- ESTADO MODAL EDICIÓN --
+    private bool mostrarModalEdicion = false;
+    private bool esModoEdicion = true;
+    private ApplicationUser usuarioEnEdicion = new();
+
+    // -- ESTADO MODAL DETALLE --
+    private bool mostrarModalDetalle = false;
+    private ApplicationUser usuarioEnDetalle = new();
+    private List<DireccionesDelivery> listaDirecciones = new();
+    private List<AutorizadosEntrega> listaAutorizados = new();
+    private List<Paquetes> listaPaquetes = new();
+
+    // LÓGICA DE FILTRADO ACTUALIZADA
     private List<ApplicationUser> UsuariosFiltrados =>
         string.IsNullOrWhiteSpace(terminoBusqueda)
         ? TodosLosUsuarios
         : TodosLosUsuarios.Where(u =>
             (u.NombreCompleto?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (u.Email?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false) ||
-            (u.Identificacion?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false)
+            (u.Identificacion?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.UserName?.Contains(terminoBusqueda, StringComparison.OrdinalIgnoreCase) ?? false) // <-- AQUI SE AGREGO EL FILTRO POR EPS
           ).ToList();
 
     protected override async Task OnInitializedAsync()
     {
-        // Cargar usuarios de la base de datos
-        // Nota: UserManager no tiene un método directo "ToList", hay que usar IQueryable
-        TodosLosUsuarios = await UserManager.Users.ToListAsync();
+        await CargarUsuarios();
+    }
+
+    private async Task CargarUsuarios()
+    {
+        TodosLosUsuarios = await UserManager.Users.Where(u => u.UserName != u.Email).ToListAsync();
+    }
+
+    // --- LÓGICA MODAL EDICIÓN ---
+    private void AbrirModalEdicion(ApplicationUser user, bool modoEditar)
+    {
+        esModoEdicion = modoEditar;
+        usuarioEnEdicion = new ApplicationUser
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            NombreCompleto = user.NombreCompleto,
+            Identificacion = user.Identificacion,
+            PhoneNumber = user.PhoneNumber,
+            ConcurrencyStamp = user.ConcurrencyStamp,
+            LockoutEnd = user.LockoutEnd,
+            LockoutEnabled = user.LockoutEnabled
+        };
+        mostrarModalEdicion = true;
+    }
+
+    private async Task GuardarCambios()
+    {
+        try
+        {
+            var userReal = await UserManager.FindByIdAsync(usuarioEnEdicion.Id);
+            if (userReal != null)
+            {
+                userReal.NombreCompleto = usuarioEnEdicion.NombreCompleto;
+                userReal.Identificacion = usuarioEnEdicion.Identificacion;
+                userReal.PhoneNumber = usuarioEnEdicion.PhoneNumber;
+
+                var result = await UserManager.UpdateAsync(userReal);
+                if (result.Succeeded)
+                {
+                    await CargarUsuarios();
+                    mostrarModalEdicion = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al guardar: {ex.Message}");
+        }
+    }
+
+    // Lógica para Deshabilitar (Bloquear) o Reactivar
+    private async Task ConfirmarCambioEstado()
+    {
+        try
+        {
+            var userReal = await UserManager.FindByIdAsync(usuarioEnEdicion.Id);
+            if (userReal != null)
+            {
+                bool estaBloqueado = userReal.LockoutEnd.HasValue && userReal.LockoutEnd.Value > DateTimeOffset.Now;
+
+                if (estaBloqueado)
+                {
+                    // REACTIVAR: Eliminar bloqueo
+                    userReal.LockoutEnd = DateTimeOffset.Now.AddDays(-1);
+                    userReal.LockoutEnabled = true;
+
+                    await UserManager.UpdateAsync(userReal);
+                }
+                else
+                {
+                    // DESHABILITAR: Bloquear por mucho tiempo
+                    if (!userReal.LockoutEnabled)
+                    {
+                        userReal.LockoutEnabled = true;
+                        await UserManager.UpdateAsync(userReal);
+                    }
+
+                    await UserManager.SetLockoutEndDateAsync(userReal, DateTimeOffset.MaxValue);
+                }
+
+                await CargarUsuarios();
+                mostrarModalEdicion = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cambiar estado: {ex.Message}");
+        }
+    }
+
+    // --- LÓGICA MODAL DETALLES ---
+    private async Task VerDetallesUsuario(ApplicationUser user)
+    {
+        usuarioEnDetalle = user;
+
+        listaDirecciones = await direccionesService.Listar(d => d.ClienteId == user.Id);
+        listaAutorizados = await autorizadosService.Listar(a => a.ClienteId == user.Id);
+        listaPaquetes = await paquetesService.Listar(p => p.ClienteId == user.Id);
+
+        mostrarModalDetalle = true;
+    }
+
+    private void CerrarModales()
+    {
+        mostrarModalEdicion = false;
+        mostrarModalDetalle = false;
     }
 }

@@ -1,87 +1,284 @@
-/* El contenedor translúcido redondeado */
+/* ================================================= */
+/* CONTENEDOR DEL MENÚ                               */
+/* ================================================= */
 .nav-card {
-    background: rgba(255, 255, 255, 0.1); /* Figma: 10% opacidad */
-    border-radius: 30px; /* Figma: Radio de 30px */
-    width: 174px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    width: 100%;
     height: 100%;
-    min-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 2rem;
-    padding-bottom: 1rem;
-    backdrop-filter: blur(5px);
+    padding: 1.5rem 0;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-right: 1px solid rgba(255,255,255,0.1);
 }
 
 .nav-item {
     width: 100%;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
 }
 
-/* Estilos del enlace (NavLink y Botones) */
+/* Enlaces */
 ::deep .nav-link {
     display: flex;
-    flex-direction: column; /* Icono arriba, texto abajo */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #FFFFFF;
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     background: transparent !important;
-    border: none; /* Importante para el botón de logout */
-    width: 100%; /* Importante para el botón de logout */
+    border: none;
+    width: 100%;
+    padding: 5px 0;
     cursor: pointer;
 }
 
-/* Iconos */
 .nav-icon {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
-    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+    transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-/* Texto (Jaldi) */
 .nav-text {
     font-family: 'Jaldi', sans-serif;
-    font-size: 24px;
+    font-size: 15px;
     font-weight: 400;
-    text-transform: capitalize;
-    line-height: 1;
+    line-height: 1.2;
 }
 
-/* Efecto Hover */
+/* Efectos Hover */
 ::deep .nav-link:hover {
-    transform: scale(1.05);
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    color: #ffffff;
+    transform: translateY(-3px);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 195, 255, 0.6);
 }
 
-/* Estado Activo */
+    ::deep .nav-link:hover .nav-icon {
+        transform: scale(1.2);
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+    }
+
+/* Activo */
 ::deep .nav-link.active {
+    color: #ffffff;
     font-weight: 700;
     opacity: 1;
+    text-shadow: 0 0 15px rgba(0, 195, 255, 0.8);
 }
 
-/* CORRECCIÓN 1: Se llama .nav-footer en el HTML, no .menu-footer */
+    ::deep .nav-link.active .nav-icon {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 5px rgba(0, 195, 255, 0.8));
+    }
+
+    ::deep .nav-link.active::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background-color: #00c3ff;
+        border-radius: 4px 0 0 4px;
+        box-shadow: 0 0 10px #00c3ff;
+    }
+
+/* Footer y Logo */
 .nav-footer {
     margin-top: auto;
     display: flex;
     justify-content: center;
     width: 100%;
+    padding-bottom: 15px;
 }
 
-/* CORRECCIÓN 2: Estilos específicos para resetear el botón de Logout */
-.logout-btn {
-    appearance: none; /* Quita estilos nativos de botón */
-    padding: 0;
-    background: transparent;
-}
-
-/* Tu imagen del logo */
 .toggle-logo {
-    width: 65px;
+    width: 45px;
     height: auto;
     object-fit: contain;
-    /* El transform depende de tu gusto visual, si lo ves centrado déjalo, si no quítalo */
-    transform: translateX(15px);
+    display: block;
+    margin: 0 auto;
+    opacity: 0.8;
+    transition: all 0.3s;
 }
+
+.clickable-logo {
+    cursor: pointer;
+}
+
+    .clickable-logo:hover {
+        opacity: 1;
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 8px rgba(255,255,255,0.8));
+    }
+
+/* ================================================= */
+/* ESTILOS DEL MODAL (POPUP) CORREGIDOS              */
+/* ================================================= */
+
+.profile-overlay {
+    position: fixed;
+    /* TRUCO: Hacemos el fondo GIGANTE y lo movemos atrás para asegurar que cubra todo */
+    top: -50vh;
+    left: -50vw;
+    width: 200vw;
+    height: 200vh;
+    /* Fondo oscuro fuerte (negro 70%) */
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    cursor: default;
+    backdrop-filter: blur(4px); /* Difumina el fondo */
+}
+
+.profile-popup-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* CAMBIO: Ancho aumentado a 400px (Más grande) */
+    width: 400px;
+    background-color: #f0f0f0;
+    border-radius: 15px;
+    /* Sombra muy fuerte para resaltar sobre lo negro */
+    box-shadow: 0 25px 80px rgba(0,0,0,0.8);
+    padding: 30px;
+    z-index: 2001;
+    color: #004d66;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #fff;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Estilos internos del perfil */
+.profile-icon-large {
+    font-size: 4rem; /* Icono más grande */
+    color: #006080;
+    margin-bottom: 10px;
+}
+
+.profile-name {
+    font-size: 1.5rem; /* Nombre más grande */
+    font-weight: 800;
+    margin: 0;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.profile-eps-number {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #006080;
+    margin: 5px 0 15px 0;
+}
+
+.profile-branch {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #555;
+}
+
+.address-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.7);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.addr-title {
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #006089;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+}
+
+.addr-text {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #333;
+}
+
+.profile-actions-row {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #006080;
+    gap: 5px;
+    padding: 5px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+    .action-item:hover {
+        color: #008eb2;
+        transform: scale(1.1);
+        background: rgba(0,0,0,0.05);
+    }
+
+    .action-item i {
+        font-size: 1.8rem;
+    }
+
+    .action-item span {
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+.btn-logout {
+    background-color: #0099cc;
+    color: white;
+    border: none;
+    padding: 12px 0;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 153, 204, 0.3);
+}
+
+    .btn-logout:hover {
+        background-color: #0077a3;
+        transform: translateY(-2px);
+    }}
+
+    .btn-logout:hover {
+        background-color: #0077a3;
+    }

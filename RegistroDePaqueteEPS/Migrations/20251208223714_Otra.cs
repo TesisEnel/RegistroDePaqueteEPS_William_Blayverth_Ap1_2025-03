@@ -221,6 +221,36 @@ namespace RegistroDePaqueteEPS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Paquetes",
+                columns: table => new
+                {
+                    PaqueteId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ClienteId = table.Column<string>(type: "TEXT", nullable: false),
+                    PreavisoId = table.Column<int>(type: "INTEGER", nullable: true),
+                    NumeroRecepcion = table.Column<string>(type: "TEXT", nullable: false, computedColumnSql: "'MIO' || printf('%08d', PaqueteId)"),
+                    NumeroTracking = table.Column<string>(type: "TEXT", nullable: false),
+                    NumeroEPS = table.Column<string>(type: "TEXT", nullable: false),
+                    Suplidor = table.Column<string>(type: "TEXT", nullable: false),
+                    Contenido = table.Column<string>(type: "TEXT", nullable: false),
+                    Peso = table.Column<double>(type: "REAL", nullable: false),
+                    Total = table.Column<double>(type: "REAL", nullable: false),
+                    CondicionEspecial = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Categoria = table.Column<string>(type: "TEXT", nullable: false),
+                    Retenido = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Paquetes", x => x.PaqueteId);
+                    table.ForeignKey(
+                        name: "FK_Paquetes_AspNetUsers_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DireccionesDelivery",
                 columns: table => new
                 {
@@ -251,7 +281,7 @@ namespace RegistroDePaqueteEPS.Migrations
                         column: x => x.AutorizadoEntregaId,
                         principalTable: "AutorizadosEntrega",
                         principalColumn: "AutorizadoEntregaId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -267,35 +297,11 @@ namespace RegistroDePaqueteEPS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EstatusPaqueteDetalles", x => x.EstatusPaqueteDetalleId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Paquetes",
-                columns: table => new
-                {
-                    PaqueteId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ClienteId = table.Column<string>(type: "TEXT", nullable: false),
-                    PreavisoId = table.Column<int>(type: "INTEGER", nullable: true),
-                    NumeroRecepcion = table.Column<string>(type: "TEXT", nullable: false, computedColumnSql: "'MIO' || printf('%08d', PaqueteId)"),
-                    NumeroTracking = table.Column<string>(type: "TEXT", nullable: false),
-                    NumeroEPS = table.Column<string>(type: "TEXT", nullable: false),
-                    Suplidor = table.Column<string>(type: "TEXT", nullable: false),
-                    Contenido = table.Column<string>(type: "TEXT", nullable: false),
-                    Peso = table.Column<double>(type: "REAL", nullable: false),
-                    Total = table.Column<double>(type: "REAL", nullable: false),
-                    CondicionEspecial = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Categoria = table.Column<string>(type: "TEXT", nullable: false),
-                    Retenido = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Paquetes", x => x.PaqueteId);
                     table.ForeignKey(
-                        name: "FK_Paquetes_AspNetUsers_ClienteId",
-                        column: x => x.ClienteId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
+                        name: "FK_EstatusPaqueteDetalles_Paquetes_PaqueteId",
+                        column: x => x.PaqueteId,
+                        principalTable: "Paquetes",
+                        principalColumn: "PaqueteId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -413,11 +419,6 @@ namespace RegistroDePaqueteEPS.Migrations
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Paquetes_PreavisoId",
-                table: "Paquetes",
-                column: "PreavisoId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Preavisos_ClienteId",
                 table: "Preavisos",
                 column: "ClienteId");
@@ -425,39 +426,13 @@ namespace RegistroDePaqueteEPS.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Preavisos_PaqueteId",
                 table: "Preavisos",
-                column: "PaqueteId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_EstatusPaqueteDetalles_Paquetes_PaqueteId",
-                table: "EstatusPaqueteDetalles",
                 column: "PaqueteId",
-                principalTable: "Paquetes",
-                principalColumn: "PaqueteId",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Paquetes_Preavisos_PreavisoId",
-                table: "Paquetes",
-                column: "PreavisoId",
-                principalTable: "Preavisos",
-                principalColumn: "PreavisoId");
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Paquetes_AspNetUsers_ClienteId",
-                table: "Paquetes");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Preavisos_AspNetUsers_ClienteId",
-                table: "Preavisos");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Preavisos_Paquetes_PaqueteId",
-                table: "Preavisos");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -486,19 +461,19 @@ namespace RegistroDePaqueteEPS.Migrations
                 name: "EstatusPaqueteDetalles");
 
             migrationBuilder.DropTable(
+                name: "Preavisos");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AutorizadosEntrega");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "Paquetes");
 
             migrationBuilder.DropTable(
-                name: "Preavisos");
+                name: "AspNetUsers");
         }
     }
 }

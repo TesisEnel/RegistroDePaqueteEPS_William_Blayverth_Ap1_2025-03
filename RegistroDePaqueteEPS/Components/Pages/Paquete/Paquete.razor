@@ -4,7 +4,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 
-
 <SectionContent SectionName="TituloPagina">
     <h1>PAQUETES</h1>
 </SectionContent>
@@ -13,7 +12,7 @@
 
     <AuthorizeView Roles="Admin">
         <Authorized>
-            <div class="top-actions">
+            <div class="d-flex justify-content-end mb-3">
                 <a href="/paquetesusuario/create" class="btn-new">
                     <i class="bi bi-plus-lg"></i> Agregar Paquete
                 </a>
@@ -22,31 +21,22 @@
     </AuthorizeView>
 
     <div class="table-header-row">
-
         <div class="col-cell"># Recepción</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Fecha</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell wide"># Tracking</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Suplidor</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Contenido</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell small">Peso</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Estatus</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Total</div>
         <div class="vertical-line"></div>
-
         <div class="col-cell">Condición</div>
     </div>
 
@@ -63,42 +53,115 @@
             {
                 <div class="data-row justify-content-center">
 
-                    <div class="col-cell">@paquete.NumeroRecepcion</div>
+                    <div class="col-cell">
+                        <button type="button" class="btn-recepcion-link"
+                                @onclick="() => AbrirModalEdicion(paquete)"
+                                @onclick:stopPropagation="true">
+                            @paquete.NumeroRecepcion
+                        </button>
+                    </div>
                     <div class="vertical-line"></div>
 
                     <div class="col-cell">@DateTime.Now.ToString("dd/MM/yyyy")</div>
                     <div class="vertical-line"></div>
-
                     <div class="col-cell wide">@paquete.NumeroTracking</div>
                     <div class="vertical-line"></div>
-
                     <div class="col-cell">@paquete.Suplidor</div>
                     <div class="vertical-line"></div>
-
                     <div class="col-cell">@paquete.Contenido</div>
                     <div class="vertical-line"></div>
-
-                    <div class="col-cell small">@paquete.Peso</div>
+                    <div class="col-cell small">@paquete.Peso lb</div>
                     <div class="vertical-line"></div>
 
-                    <div class="col-cell">@("Disponible")</div>
-                    <div class="vertical-line"></div>
+                    <div class="col-cell status-col" style="color:@GetStatusColor(8)">
+                        @* Aquí puedes poner un icono o texto *@
+                        <i class="bi bi-check-circle"></i>
+                    </div>
 
-                    <div class="col-cell">@paquete.Total</div>
                     <div class="vertical-line"></div>
-
+                    <div class="col-cell">US$ @paquete.Total</div>
+                    <div class="vertical-line"></div>
                     <div class="col-cell">@(paquete.CondicionEspecial ? "Especial" : "Normal")</div>
                 </div>
             }
         }
     </div>
+
 </div>
+
+@if (mostrarModalEdicion)
+{
+    <div class="modal-backdrop" @onclick="CerrarModal">
+        <div class="modal-window-blue" @onclick:stopPropagation>
+
+            <div class="eps-header">
+                <img src="/Imagenes/EPS_Barra_Superior.png" alt="EPS Logo" />
+                <button type="button" class="btn-close-x" @onclick="CerrarModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="eps-body-blue">
+                <h3 style="border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:10px; margin-bottom:20px;">
+                    Estatus Paquete
+                </h3>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="button" @onclick="ActualizarPaquete" class="btn-new">Actualizar Paquete</button>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+
+                <div class="table-header-row" style="color: #006089;">
+                    <div class="col-cell">Estatus</div>
+                    <div class="vertical-line"></div>
+                    <div class="col-cell">Fecha</div>
+                </div>
+
+                <div class="rows-container">
+                    @foreach (EstatusPaqueteDetalles estatus in PaqueteEnEdicion.EstatusPaquete)
+                    {
+                        <div class="data-row justify-content-center">
+                            <div class="col-cell" style="color:@GetStatusColor(estatus.EstatusPaqueteId)">
+                                @ListaEstatus.FirstOrDefault(t => t.EstatusPaqueteId == estatus.EstatusPaqueteId)?.Descripcion
+                            </div>
+                            <div class="vertical-line"></div>
+                            <div class="col-cell">@estatus.Fecha.ToString("dd/MM/yyyy hh:mm")</div>
+                        </div>
+                    }
+                </div>
+
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <div class="modal-footer-actions">
+                            <button type="button" class="btn-blue-cancel" @onclick="CerrarModal">Cancelar</button>
+                            <button type="button" class="btn-blue-save" disabled=@actualizado @onclick="GuardarCambiosPaquete">Guardar Cambios</button>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     public List<Paquetes> ListaPaquetes { get; set; } = new List<Paquetes>();
+    public List<EstatusPaquete> ListaEstatus { get; set; }
     private ApplicationUser appUser;
+    private bool actualizado = true;
+
+    // --- VARIABLES MODAL ---
+    private bool mostrarModalEdicion = false;
+    private Paquetes PaqueteEnEdicion = new Paquetes();
 
     protected override async Task OnInitializedAsync()
+    {
+        await CargarPaquetes();
+        ListaEstatus = await paquetesService.ListarEstatus();
+    }
+
+    private async Task CargarPaquetes()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userClaimsPrincipal = authState.User;
@@ -107,44 +170,82 @@
         {
             appUser = await UserManager.GetUserAsync(userClaimsPrincipal);
         }
-        if (userClaimsPrincipal.IsInRole("Cliente"))
+
+        if (appUser != null && userClaimsPrincipal.IsInRole("Cliente"))
             ListaPaquetes = await paquetesService.Listar(p => p.PaqueteId > 0 && p.ClienteId == appUser.Id);
         else
             ListaPaquetes = await paquetesService.Listar(p => p.PaqueteId > 0);
-            
     }
 
-    // --- LÓGICA VISUAL (Colores e Iconos) ---
-
-    private string GetStatusColor(string status)
+    private void AbrirModalEdicion(Paquetes paqueteOriginal)
     {
-        return status switch
+        PaqueteEnEdicion = new Paquetes
         {
-            "Almacén de Origen" => "#FC0202",
-            "Embarcado" => "#0BC8A2",
-            "Linea Aérea" => "#B537A3",
-            "Aduanas" => "#239FC3",
-            "Centro de Distribución" => "#FFB130",
-            "Transito a la Oficina" => "#767560",
-            "Disponible" => "#78BE42",
-            "Entregado al cliente" => "#6FDCDC",
-            _ => "#78BE42" // Color por defecto (Verde Disponible)
+            PaqueteId = paqueteOriginal.PaqueteId,
+            ClienteId = paqueteOriginal.ClienteId,
+            NumeroRecepcion = paqueteOriginal.NumeroRecepcion,
+            NumeroTracking = paqueteOriginal.NumeroTracking,
+            NumeroEPS = paqueteOriginal.NumeroEPS,
+            Suplidor = paqueteOriginal.Suplidor,
+            Contenido = paqueteOriginal.Contenido,
+            Peso = paqueteOriginal.Peso,
+            Total = paqueteOriginal.Total,
+            CondicionEspecial = paqueteOriginal.CondicionEspecial,
+            Categoria = paqueteOriginal.Categoria,
+            Retenido = paqueteOriginal.Retenido,
+            EstatusPaquete = paqueteOriginal.EstatusPaquete.ToList()
         };
+
+        mostrarModalEdicion = true;
     }
 
-    private string GetStatusIcon(string status)
+    private void ActualizarPaquete()
     {
-        return status switch
+        int nuevoId = PaqueteEnEdicion.EstatusPaquete.Count() + 1;
+        if(nuevoId <= 8)
         {
-            "Almacén de Origen" => "bi bi-building",
-            "Embarcado" => "bi bi-box-seam",
-            "Linea Aérea" => "bi bi-airplane",
-            "Aduanas" => "bi bi-bank",
-            "Centro de Distribución" => "bi bi-geo-alt",
-            "Transito a la Oficina" => "bi bi-truck",
-            "Disponible" => "bi bi-check-circle",
-            "Entregado al cliente" => "bi bi-person-check",
-            _ => "bi bi-check-circle"
-        };
+            EstatusPaqueteDetalles EstatusPaquete = new EstatusPaqueteDetalles();
+            EstatusPaquete.EstatusPaqueteId = PaqueteEnEdicion.EstatusPaquete.Count() + 1;
+            if(nuevoId == 7)
+            {
+                PaqueteEnEdicion.Total = PaqueteEnEdicion.Peso * 320;
+            }
+            PaqueteEnEdicion.EstatusPaquete.Add(EstatusPaquete);
+            actualizado = false;
+        }
+    }
+
+    private void CerrarModal()
+    {
+        PaqueteEnEdicion = new Paquetes();
+        mostrarModalEdicion = false;
+        actualizado = true;
+    }
+
+    private async Task GuardarCambiosPaquete()
+    {
+        var guardado = await paquetesService.Guardar(PaqueteEnEdicion);
+
+        if (guardado)
+        {
+            mostrarModalEdicion = false;
+            await CargarPaquetes();
+        }
+    }
+
+    private string GetStatusColor(int idstatus)
+    {
+        switch (idstatus)
+        {
+            case 1: return "#FC0202"; // Rojo
+            case 2: return "#0BC8A2"; // Verde Agua
+            case 3: return "#B537A3"; // Morado
+            case 4: return "#239FC3"; // Azul
+            case 5: return "#FFB130"; // Naranja
+            case 6: return "#767560"; // Oliva
+            case 7: return "#78BE42"; // Verde
+            case 8: return "#6FDCDC"; // Celeste
+            default: return "#333333"; // Color por defecto (Gris oscuro)
+        }
     }
 }
