@@ -86,10 +86,11 @@
 /* --- ENLACES INFERIORES --- */
 .login-links {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* CAMBIO AQUÍ: Centra el contenido horizontalmente */
     width: 100%;
     margin-top: 2rem;
     padding: 0 10px;
+    gap: 20px; /* Opcional: Añade espacio si agregas más enlaces en el futuro */
 }
 
     .login-links a {
