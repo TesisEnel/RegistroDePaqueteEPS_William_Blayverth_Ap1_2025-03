@@ -42,17 +42,10 @@
                         <span class="nav-text">Destinatario</span>
                     </NavLink>
                 </div>
-
-                <div class="nav-item">
-                    <NavLink class="nav-link" href="reporte">
-                        <i class="bi bi-credit-card-fill nav-icon"></i>
-                        <span class="nav-text">Reporte</span>
-                    </NavLink>
-                </div>
             </Authorized>
         </AuthorizeView>
 
-        <AuthorizeView>
+        <AuthorizeView Roles="Cliente">
             <Authorized>
                 <div class="nav-item">
                     <NavLink class="nav-link" href="cuenta">
