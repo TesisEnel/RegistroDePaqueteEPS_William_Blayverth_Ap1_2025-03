@@ -51,38 +51,6 @@
         </div>
     </div>
 
-    <div class="charts-section">
-
-        <div class="chart-card">
-            <h3 class="chart-title">Estatus</h3>
-
-            @* Dona muy compacta *@
-            <MudChart ChartType="ChartType.Donut"
-                      Width="140px"
-                      Height="140px"
-                      InputData="@DataGrafico"
-                      Class="mud-chart-custom">
-                <CustomGraphics>
-                    <text class="donut-inner-text" x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="#006089" font-family="Jaldi" font-weight="bold" font-size="14">Total</text>
-                    <text class="donut-inner-text" x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" fill="#333" font-family="Jaldi" font-size="20">@TotalPaquetes</text>
-                </CustomGraphics>
-            </MudChart>
-        </div>
-
-        <div class="chart-card">
-            <h3 class="chart-title">Mensual</h3>
-
-            @* Barras con altura reducida a 180px *@
-            <MudChart ChartType="ChartType.Bar"
-                      ChartSeries="@SeriesBarras"
-                      XAxisLabels="@XAxisLabels"
-                      Width="100%"
-                      Height="180px"
-                      Class="mud-chart-custom">
-            </MudChart>
-        </div>
-    </div>
-
 </div>
 
 @code {

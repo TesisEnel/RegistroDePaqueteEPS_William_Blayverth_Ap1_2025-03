@@ -8,7 +8,7 @@
     font-weight: 700;
     text-decoration: underline;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     padding: 0;
 }
 
@@ -21,17 +21,72 @@
     line-height: 1;
 }
 
+/* ================================================= */
+/* MODALES (Solución Fondo Negro y Centrado)         */
+/* ================================================= */
+
+/* FONDO GIGANTE: Cubre 200% para evitar bordes blancos por el Zoom */
+.modal-backdrop {
+    position: fixed;
+    top: -50vh;
+    left: -50vw;
+    width: 200vw;
+    height: 200vh;
+    background-color: rgba(0, 0, 0, 0.7); /* Oscuro al 70% */
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    /* Flexbox para asegurar centrado si el child no usa fixed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: default;
+}
+
 /* --- MODAL AZUL (Específico de esta página) --- */
 .modal-window-blue {
-    background-color: white;
+    /* Posición relativa porque el backdrop flex lo centra */
+    /* O puedes usar fixed + transform si prefieres forzarlo */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 90%;
     max-width: 800px;
-    border-radius: 8px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.6);
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    animation: slideDown 0.3s ease-out;
     display: flex;
     flex-direction: column;
+    z-index: 2001;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.eps-header {
+    background-color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #0099cc;
+    height: 60px;
+    width: 100%;
+}
+
+    .eps-header img {
+        height: 35px;
+        object-fit: contain;
+    }
+
+.btn-close-modal, .btn-close-x {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: #333;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
 }
 
 .eps-body-blue {
@@ -39,6 +94,9 @@
     padding: 25px;
     color: white;
     min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 /* Botones específicos dentro del modal azul */
@@ -81,3 +139,23 @@
     .btn-blue-cancel:hover {
         background: rgba(255,255,255,0.1);
     }
+
+/* Animación Pop In Centrada */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* RESPONSIVIDAD */
+@media (max-width: 1000px) {
+    .rows-container {
+        overflow-x: auto;
+    }
+}

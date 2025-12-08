@@ -1,8 +1,13 @@
 ﻿@page "/cuenta/autorizados/upsert/{AutorizadoEntregaId:int}"
+
+@using BlazorBootstrap
+@using RegistroDePaqueteEPS.Extensors
+
 @inject NavigationManager NavManager
 @inject AutorizadosEntregaService autorizadosEntregaService
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ToastService toastService
 @rendermode InteractiveServer
 
 
@@ -82,29 +87,69 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (AutorizadoEntregaId > 0)
+        try
         {
-            Estado = "Editar";
-            Autorizado = await autorizadosEntregaService.Buscar(AutorizadoEntregaId);
+            if (AutorizadoEntregaId > 0)
+            {
+                Estado = "Editar";
+                Autorizado = await autorizadosEntregaService.Buscar(AutorizadoEntregaId);
+
+                // Validación opcional: Si no encuentra el autorizado
+                if (Autorizado == null)
+                {
+                    toastService.ShowError("No se encontró el autorizado solicitado.");
+                    NavManager.NavigateTo("/cuenta/autorizados");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Error al cargar datos: {ex.Message}");
         }
     }
 
     private async Task GuardarAutorizado()
     {
-        if (AutorizadoEntregaId == 0)
+        try
         {
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var userClaimsPrincipal = authState.User;
-
-            if (userClaimsPrincipal.Identity.IsAuthenticated)
+            // Asignar ClienteId solo si es nuevo
+            if (AutorizadoEntregaId == 0)
             {
-                appUser = await UserManager.GetUserAsync(userClaimsPrincipal);
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var userClaimsPrincipal = authState.User;
+
+                if (userClaimsPrincipal.Identity.IsAuthenticated)
+                {
+                    appUser = await UserManager.GetUserAsync(userClaimsPrincipal);
+                }
+
+                if (appUser != null)
+                {
+                    Autorizado.ClienteId = appUser.Id;
+                }
+                else
+                {
+                    toastService.ShowError("No se pudo identificar al usuario actual.");
+                    return;
+                }
             }
 
-            Autorizado.ClienteId = appUser.Id;
-        }
+            var modificado = await autorizadosEntregaService.Guardar(Autorizado);
 
-        var modificado = await autorizadosEntregaService.Guardar(Autorizado);
-        if (modificado) NavManager.NavigateTo("/cuenta/autorizados");
+            if (modificado)
+            {
+                string accion = AutorizadoEntregaId == 0 ? "creado" : "actualizado";
+                toastService.ShowSuccess($"El autorizado ha sido {accion} correctamente.", "Éxito");
+                NavManager.NavigateTo("/cuenta/autorizados");
+            }
+            else
+            {
+                toastService.ShowWarning("No se realizaron cambios o hubo un problema al guardar.");
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Ocurrió un error inesperado: {ex.Message}", "Error");
+        }
     }
 }
