@@ -18,7 +18,6 @@ builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 builder.Services.AddMudServices();
-builder.Services.AddBlazorBootstrap();
 
 // 3. Servicios de Negocio (Tus servicios propios)
 // Podrías mover esto a un método de extensión si la lista crece mucho

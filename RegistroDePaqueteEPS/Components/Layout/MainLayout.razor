@@ -1,12 +1,12 @@
 ﻿@inherits LayoutComponentBase
 @using MudBlazor
-@using BlazorBootstrap
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavManager
 
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
-
-<Toasts class="p-3" Placement="ToastsPlacement.TopRight" />
 
 <div class="page dashboard-scale">
 
@@ -19,8 +19,18 @@
             <SectionOutlet SectionName="TituloPagina" />
         </div>
 
-        <div style="width: 200px;"></div>
-
+        <AuthorizeView Roles="Cliente">
+            <Authorized>
+                <div class="user-header-info">
+                    <div class="text-right">
+                        <span class="user-name-text">@NombreUsuario</span>
+                        <br />
+                        <span class="user-code-text">@CodigoEPS</span>
+                    </div>
+                    <i class="bi bi-person-fill user-header-icon"></i>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </header>
 
     <div class="main-container">
@@ -40,3 +50,24 @@
         </aside>
     </div>
 </div>
+
+@code {
+    private string NombreUsuario = "Cargando...";
+    private string CodigoEPS = "---";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userPrincipal = authState.User;
+
+        if (userPrincipal.Identity != null && userPrincipal.Identity.IsAuthenticated)
+        {
+            var appUser = await UserManager.GetUserAsync(userPrincipal);
+            if (appUser != null)
+            {
+                NombreUsuario = appUser.NombreCompleto ?? userPrincipal.Identity.Name;
+                CodigoEPS = appUser.UserName;
+            }
+        }
+    }
+}

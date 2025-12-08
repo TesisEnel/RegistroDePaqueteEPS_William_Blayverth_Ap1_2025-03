@@ -131,3 +131,28 @@
         padding: 0;
     }
 }
+/* Usuario (Visualización) */
+.user-header-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    cursor: default; /* Ya no es puntero porque no es clicable aquí */
+    color: #006080;
+    width: 200px;
+}
+
+.user-name-text {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.1;
+}
+
+.user-code-text {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.user-header-icon {
+    font-size: 2rem;
+}

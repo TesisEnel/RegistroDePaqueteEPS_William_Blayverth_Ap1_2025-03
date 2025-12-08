@@ -32,10 +32,10 @@
         <div class="vertical-line"></div>
         <div class="col-cell">Identificación</div>
         <div class="vertical-line"></div>
+        <div class="col-cell">Teléfono</div> <div class="vertical-line"></div>
         <div class="col-cell">Correo</div>
         <div class="vertical-line"></div>
-        <div class="col-cell">Teléfono</div>
-        <div class="vertical-line"></div>
+        <div class="col-cell">Estado</div> <div class="vertical-line"></div>
         <div class="col-cell small">Opciones</div>
     </div>
 
@@ -50,7 +50,12 @@
         {
             @foreach (var user in UsuariosFiltrados)
             {
-                <div class="data-row">
+                // Verificamos si está bloqueado
+                bool estaDeshabilitado = user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.Now;
+
+                // Estilo visual si está inactivo
+                <div class="data-row" style="@(estaDeshabilitado ? "opacity: 0.6; background-color: #f0f0f0;" : "")">
+
                     <div class="col-cell small">
                         <button class="btn-link-eps" @onclick="() => VerDetallesUsuario(user)">
                             @user.UserName
@@ -60,20 +65,47 @@
 
                     <div class="col-cell">@(user.NombreCompleto ?? "N/A")</div>
                     <div class="vertical-line"></div>
+
                     <div class="col-cell">@(user.Identificacion ?? "N/A")</div>
                     <div class="vertical-line"></div>
+
+                    <div class="col-cell">@(user.PhoneNumber ?? "N/A")</div>
+                    <div class="vertical-line"></div>
+
                     <div class="col-cell email-text">@user.Email</div>
                     <div class="vertical-line"></div>
-                    <div class="col-cell">@(user.PhoneNumber ?? "N/A")</div>
+
+                    <div class="col-cell">
+                        @if (estaDeshabilitado)
+                        {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                    </div>
                     <div class="vertical-line"></div>
 
                     <div class="col-cell small actions-cell">
                         <button class="btn-icon edit" title="Editar" @onclick="() => AbrirModalEdicion(user, true)">
                             <i class="bi bi-pencil-square"></i>
                         </button>
-                        <button class="btn-icon delete" title="Eliminar" @onclick="() => AbrirModalEdicion(user, false)">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
+
+                        @if (estaDeshabilitado)
+                        {
+                            // Botón Reactivar
+                            <button class="btn-icon" style="color: #28a745;" title="Reactivar Usuario" @onclick="() => AbrirModalEdicion(user, false)">
+                                <i class="bi bi-person-check-fill"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            // Botón Deshabilitar
+                            <button class="btn-icon delete" title="Deshabilitar Usuario" @onclick="() => AbrirModalEdicion(user, false)">
+                                <i class="bi bi-person-slash"></i>
+                            </button>
+                        }
                     </div>
                 </div>
             }
@@ -81,7 +113,7 @@
     </div>
 </div>
 
-@* --- 1. MODAL AZUL (EDICIÓN / ELIMINACIÓN) --- *@
+@* --- 1. MODAL AZUL (EDICIÓN / CAMBIO DE ESTADO) --- *@
 @if (mostrarModalEdicion)
 {
     <div class="modal-backdrop" @onclick="CerrarModales">
@@ -117,14 +149,34 @@
                 }
                 else
                 {
-                    <h3>ELIMINAR USUARIO</h3>
-                    <p>¿Estás seguro que deseas eliminar al usuario <strong>@usuarioEnEdicion.NombreCompleto</strong>?</p>
-                    <p style="font-size: 0.9rem; opacity: 0.8;">Esta acción no se puede deshacer.</p>
+                    // Lógica para confirmar Deshabilitar o Reactivar
+                    bool estaBloqueado = usuarioEnEdicion.LockoutEnd.HasValue && usuarioEnEdicion.LockoutEnd.Value > DateTimeOffset.Now;
 
-                    <div class="modal-actions">
-                        <button class="btn-eps-cancel" @onclick="CerrarModales">Cancelar</button>
-                        <button class="btn-eps-primary" style="color: #c00;" @onclick="ConfirmarEliminacion">Eliminar</button>
-                    </div>
+                    if (estaBloqueado)
+                    {
+                        <h3>REACTIVAR USUARIO</h3>
+                        <p>¿Deseas reactivar al usuario <strong>@usuarioEnEdicion.NombreCompleto</strong>?</p>
+                        <p style="font-size: 0.9rem; opacity: 0.8;">El usuario podrá volver a acceder al sistema.</p>
+                        <div class="modal-actions">
+                            <button class="btn-eps-cancel" @onclick="CerrarModales">Cancelar</button>
+                            <button class="btn-eps-primary" style="color: #28a745;" @onclick="ConfirmarCambioEstado">Reactivar</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <h3>DESHABILITAR USUARIO</h3>
+                        <p>¿Marcar a <strong>@usuarioEnEdicion.NombreCompleto</strong> como inactivo?</p>
+
+                        <div class="alert alert-warning" style="color: #333; font-size: 0.9rem; margin-top: 10px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            Este usuario <strong>ya no pertenecerá a la empresa</strong> y perderá el acceso inmediatamente.
+                        </div>
+
+                        <div class="modal-actions">
+                            <button class="btn-eps-cancel" @onclick="CerrarModales">Cancelar</button>
+                            <button class="btn-eps-primary" style="color: #c00;" @onclick="ConfirmarCambioEstado">Deshabilitar</button>
+                        </div>
+                    }
                 }
             </div>
         </div>
@@ -142,6 +194,12 @@
             <i class="bi bi-person-fill detail-avatar"></i>
             <h2 class="detail-name">@usuarioEnDetalle.NombreCompleto</h2>
             <div class="detail-eps">@usuarioEnDetalle.UserName</div>
+
+            @if (usuarioEnDetalle.LockoutEnd.HasValue && usuarioEnDetalle.LockoutEnd.Value > DateTimeOffset.Now)
+            {
+                <div style="color: #dc3545; font-weight: bold; margin-bottom: 10px;">(USUARIO INACTIVO)</div>
+            }
+
             <div class="detail-branch">EPS @(usuarioEnDetalle.Municipio ?? "Salcedo")</div>
 
             <div class="details-grid">
@@ -224,12 +282,12 @@
     private List<ApplicationUser> TodosLosUsuarios = new();
     private string terminoBusqueda = "";
 
-    // -- ESTADO MODAL EDICIÓN (AZUL) --
+    // -- ESTADO MODAL EDICIÓN --
     private bool mostrarModalEdicion = false;
     private bool esModoEdicion = true;
     private ApplicationUser usuarioEnEdicion = new();
 
-    // -- ESTADO MODAL DETALLE (GRIS) --
+    // -- ESTADO MODAL DETALLE --
     private bool mostrarModalDetalle = false;
     private ApplicationUser usuarioEnDetalle = new();
     private List<DireccionesDelivery> listaDirecciones = new();
@@ -259,7 +317,6 @@
     private void AbrirModalEdicion(ApplicationUser user, bool modoEditar)
     {
         esModoEdicion = modoEditar;
-        // Clonamos para no editar la tabla en vivo
         usuarioEnEdicion = new ApplicationUser
         {
             Id = user.Id,
@@ -268,50 +325,83 @@
             NombreCompleto = user.NombreCompleto,
             Identificacion = user.Identificacion,
             PhoneNumber = user.PhoneNumber,
-            ConcurrencyStamp = user.ConcurrencyStamp
+            ConcurrencyStamp = user.ConcurrencyStamp,
+            LockoutEnd = user.LockoutEnd,
+            LockoutEnabled = user.LockoutEnabled
         };
         mostrarModalEdicion = true;
     }
 
     private async Task GuardarCambios()
     {
-        var userReal = await UserManager.FindByIdAsync(usuarioEnEdicion.Id);
-        if (userReal != null)
+        try
         {
-            userReal.NombreCompleto = usuarioEnEdicion.NombreCompleto;
-            userReal.Identificacion = usuarioEnEdicion.Identificacion;
-            userReal.PhoneNumber = usuarioEnEdicion.PhoneNumber;
-
-            var result = await UserManager.UpdateAsync(userReal);
-            if (result.Succeeded)
+            var userReal = await UserManager.FindByIdAsync(usuarioEnEdicion.Id);
+            if (userReal != null)
             {
+                userReal.NombreCompleto = usuarioEnEdicion.NombreCompleto;
+                userReal.Identificacion = usuarioEnEdicion.Identificacion;
+                userReal.PhoneNumber = usuarioEnEdicion.PhoneNumber;
+
+                var result = await UserManager.UpdateAsync(userReal);
+                if (result.Succeeded)
+                {
+                    await CargarUsuarios();
+                    mostrarModalEdicion = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al guardar: {ex.Message}");
+        }
+    }
+
+    // Lógica para Deshabilitar (Bloquear) o Reactivar
+    private async Task ConfirmarCambioEstado()
+    {
+        try
+        {
+            var userReal = await UserManager.FindByIdAsync(usuarioEnEdicion.Id);
+            if (userReal != null)
+            {
+                bool estaBloqueado = userReal.LockoutEnd.HasValue && userReal.LockoutEnd.Value > DateTimeOffset.Now;
+
+                if (estaBloqueado)
+                {
+                    // REACTIVAR: Eliminar bloqueo
+                    userReal.LockoutEnd = DateTimeOffset.Now.AddDays(-1);
+                    userReal.LockoutEnabled = true;
+
+                    await UserManager.UpdateAsync(userReal);
+                }
+                else
+                {
+                    // DESHABILITAR: Bloquear por mucho tiempo
+                    if (!userReal.LockoutEnabled)
+                    {
+                        userReal.LockoutEnabled = true;
+                        await UserManager.UpdateAsync(userReal);
+                    }
+
+                    await UserManager.SetLockoutEndDateAsync(userReal, DateTimeOffset.MaxValue);
+                }
+
                 await CargarUsuarios();
                 mostrarModalEdicion = false;
             }
         }
-    }
-
-    private async Task ConfirmarEliminacion()
-    {
-        var userReal = await UserManager.FindByIdAsync(usuarioEnEdicion.Id);
-        if (userReal != null)
+        catch (Exception ex)
         {
-            var result = await UserManager.DeleteAsync(userReal);
-            if (result.Succeeded)
-            {
-                var local = TodosLosUsuarios.FirstOrDefault(u => u.Id == userReal.Id);
-                if (local != null) TodosLosUsuarios.Remove(local);
-                mostrarModalEdicion = false;
-            }
+            Console.WriteLine($"Error al cambiar estado: {ex.Message}");
         }
     }
 
-    // --- LÓGICA MODAL DETALLES (GRIS) ---
+    // --- LÓGICA MODAL DETALLES ---
     private async Task VerDetallesUsuario(ApplicationUser user)
     {
         usuarioEnDetalle = user;
 
-        // Cargamos datos relacionados
         listaDirecciones = await direccionesService.Listar(d => d.ClienteId == user.Id);
         listaAutorizados = await autorizadosService.Listar(a => a.ClienteId == user.Id);
         listaPaquetes = await paquetesService.Listar(p => p.ClienteId == user.Id);
