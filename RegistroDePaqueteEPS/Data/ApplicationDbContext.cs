@@ -1,8 +1,9 @@
+using System.ComponentModel;
+using System.Reflection.Emit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RegistroDePaqueteEPS.Models;
-using System.ComponentModel;
-using System.Reflection.Emit;
+using static RegistroDePaqueteEPS.Components.Pages.Rembolsos.RembolsosCreate;
 
 namespace RegistroDePaqueteEPS.Data
 {
@@ -20,6 +21,7 @@ namespace RegistroDePaqueteEPS.Data
 
         public DbSet<EstatusPaqueteDetalles> EstatusPaqueteDetalles { get; set; }
 
+        public DbSet<Reembolso> Reembolsos { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
