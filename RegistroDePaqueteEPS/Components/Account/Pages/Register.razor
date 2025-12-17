@@ -126,8 +126,6 @@
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
         user.NombreCompleto = Input.NombreCompleto;
-        user.Provincia = Input.Provincia;
-        user.Municipio = Input.Sucursal;
         user.Identificacion = Input.Identificacion;
         user.Sexo = Input.Sexo;
         user.FechaNacimiento = Input.FechaNacimiento;
